@@ -15,6 +15,7 @@
     <button (click)="publicar()">Publicar</button>
   </div>
 
+  <div class="error" *ngIf="error">{{ error }}</div>
 </div>
 
 <!-- 📰 FEED -->
@@ -25,15 +26,15 @@
     <div class="post-header">
       <div class="avatar">👤</div>
       <div>
-        <strong>Usuario</strong>
-        <small>{{ post.fecha }}</small>
+        <strong>{{ post.author_id ? 'Usuario registrado' : 'Invitado' }}</strong>
+        <small>{{ post.created_at | date:'short' }}</small>
       </div>
     </div>
 
-    <p class="post-text">{{ post.texto }}</p>
+    <h3>{{ post.title }}</h3>
+    <p class="post-text">{{ post.content }}</p>
 
   </div>
-
 
 </div>
 

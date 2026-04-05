@@ -30,15 +30,11 @@ export class RegisterComponent {
       return;
     }
 
-    const created = this.auth.register(
-      this.fullName,
-      this.age,
-      this.email,
-      this.password
-    );
+    this.error = '';
 
-    if (created) {
-      this.router.navigate(['/app']);
-    }
+    this.auth.register(this.fullName, this.age, this.email, this.password).subscribe({
+      next: () => this.router.navigate(['/app']),
+      error: (err) => this.error = typeof err === 'string' ? err : 'Error al registrar el usuario'
+    });
   }
 }

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HealthService, HealthProfile } from '../../../core/services/health.service';
+import { AuthService, UserResponse } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-health',
@@ -10,7 +12,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./health.component.css']
 })
 export class HealthComponent {
-
+  user: UserResponse | null = null;
   edad: number | null = null;
   peso: number | null = null;
   altura: number | null = null;
@@ -26,74 +28,81 @@ export class HealthComponent {
   recomendacion = '';
   score = 0;
   nivel = '';
+  error = '';
+
+  constructor(
+    private healthService: HealthService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.user = this.authService.getUser();
+    if (this.user) {
+      this.loadProfile();
+    }
+  }
+
+  loadProfile() {
+    if (!this.user) return;
+    this.healthService.getProfile(this.user.id).subscribe({
+      next: (profile) => this.applyProfile(profile),
+      error: () => {
+        // Si no hay perfil, lo dejamos vacío para que el usuario lo registre.
+      }
+    });
+  }
 
   calcular() {
+    this.error = '';
 
-    if (!this.edad || !this.peso || !this.altura || !this.fcReposo) {
-      alert('Completa todos los campos');
+    if (!this.user) {
+      this.error = 'Debes iniciar sesión para guardar tu perfil de salud.';
       return;
     }
 
-    const alturaM = this.altura / 100;
-    this.imc = this.peso / (alturaM * alturaM);
+    if (!this.edad || !this.peso || !this.altura || !this.fcReposo) {
+      this.error = 'Completa todos los campos';
+      return;
+    }
 
-    // IMC categoría
-    if (this.imc < 18.5) this.imcCategoria = 'Bajo peso';
-    else if (this.imc < 25) this.imcCategoria = 'Óptimo';
-    else if (this.imc < 30) this.imcCategoria = 'Sobrepeso';
-    else this.imcCategoria = 'Obesidad';
+    this.healthService.saveProfile(this.user.id, this.altura, this.peso, this.fcReposo).subscribe({
+      next: (profile) => this.applyProfile(profile),
+      error: (err) => this.error = typeof err === 'string' ? err : 'No fue posible guardar el perfil'
+    });
+  }
 
-    // FC
-    this.fcMax = 220 - this.edad;
-    this.reserva = this.fcMax - this.fcReposo;
+  applyProfile(profile: HealthProfile) {
+    this.altura = profile.height_cm;
+    this.peso = profile.weight_kg;
+    this.fcReposo = profile.resting_hr;
+    this.imc = profile.imc;
+    this.score = profile.score;
+    this.nivel = profile.level;
+    this.recomendacion = profile.recommendation;
+    this.fcMax = this.edad ? 220 - this.edad : null;
+    this.reserva = this.fcMax && this.fcReposo ? this.fcMax - this.fcReposo : null;
+    this.imcCategoria = this.getImcCategoria(profile.imc);
+    this.zonas = this.buildZones(this.fcReposo ?? 0, this.reserva ?? 0);
+  }
 
-    // Zonas
-    this.zonas = [
-      { nombre: 'Recuperación', min: this.fcReposo + this.reserva * 0.5, max: this.fcReposo + this.reserva * 0.6, porcentaje: 50 },
-      { nombre: 'Aeróbica', min: this.fcReposo + this.reserva * 0.6, max: this.fcReposo + this.reserva * 0.7, porcentaje: 65 },
-      { nombre: 'Rendimiento', min: this.fcReposo + this.reserva * 0.7, max: this.fcReposo + this.reserva * 0.85, porcentaje: 80 }
+  getImcCategoria(imc: number) {
+    if (imc < 18.5) return 'Bajo peso';
+    if (imc < 25) return 'Óptimo';
+    if (imc < 30) return 'Sobrepeso';
+    return 'Obesidad';
+  }
+
+  buildZones(fcReposo: number, reserva: number) {
+    return [
+      { nombre: 'Recuperación', min: fcReposo + reserva * 0.5, max: fcReposo + reserva * 0.6, porcentaje: 50 },
+      { nombre: 'Aeróbica', min: fcReposo + reserva * 0.6, max: fcReposo + reserva * 0.7, porcentaje: 65 },
+      { nombre: 'Rendimiento', min: fcReposo + reserva * 0.7, max: fcReposo + reserva * 0.85, porcentaje: 80 }
     ].map(z => ({
       ...z,
       min: Math.round(z.min),
       max: Math.round(z.max)
     }));
-
-    this.calcularScore();
-    this.generarRecomendacion();
   }
-
-  calcularScore() {
-    let score = 100;
-
-    // Penalización IMC
-    if (this.imc! < 18.5 || this.imc! > 30) score -= 30;
-    else if (this.imc! > 25) score -= 15;
-
-    // FC reposo (clave fitness)
-    if (this.fcReposo! > 80) score -= 30;
-    else if (this.fcReposo! > 70) score -= 15;
-
-    this.score = Math.max(0, score);
-
-    // Nivel
-    if (this.score >= 85) this.nivel = 'Atleta 🔥';
-    else if (this.score >= 70) this.nivel = 'Buen nivel 💪';
-    else if (this.score >= 50) this.nivel = 'Mejorable ⚡';
-    else this.nivel = 'Bajo rendimiento ⚠️';
-  }
-
-  generarRecomendacion() {
-    if (this.score >= 85) {
-      this.recomendacion = 'Estás en un nivel excelente. Mantén tu rutina y cuida la recuperación.';
-    } else if (this.score >= 70) {
-      this.recomendacion = 'Buen estado físico. Puedes mejorar con entrenamientos más estructurados.';
-    } else if (this.score >= 50) {
-      this.recomendacion = 'Necesitas mejorar resistencia y composición corporal.';
-    } else {
-      this.recomendacion = 'Enfócate en hábitos básicos: descanso, alimentación y ejercicio progresivo.';
-    }
-  }
-
 
   get mensajeFcReposo(): string {
     if (!this.fcReposo) return '';

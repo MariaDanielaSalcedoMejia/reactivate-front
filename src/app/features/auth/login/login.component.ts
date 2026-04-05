@@ -36,8 +36,9 @@ export class LoginComponent {
 
     this.error = '';
 
-    this.auth.login(this.email);
-
-    this.router.navigate(['/app']);
+    this.auth.login(this.email, this.password).subscribe({
+      next: () => this.router.navigate(['/app']),
+      error: (err) => this.error = typeof err === 'string' ? err : 'Error al iniciar sesión'
+    });
   }
 }

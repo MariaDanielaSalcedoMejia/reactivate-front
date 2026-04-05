@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ParkService, Park } from '../../../core/services/park.service';
 
 @Component({
   selector: 'app-parks',
@@ -9,13 +10,19 @@ import { CommonModule } from '@angular/common';
   styleUrl: './parks.component.css',
 })
 export class ParksComponent {
-  parks = [
-    { name: 'Parque Central de la Ciudad', address: 'Av. Principal 123', rating: 4.5, distance: '0.8 km', features: ['Senderos', 'Área de ejercicio', 'Baños', 'Bancas'] },
-    { name: 'Plaza del Sol', address: 'Calle 45 y 12', rating: 4.2, distance: '1.2 km', features: ['Gimnasio al aire libre', 'Fuente de agua', 'Iluminación'] },
-    { name: 'Jardines del Río', address: 'Calle Río 78', rating: 4.6, distance: '1.9 km', features: ['Circuito cardiovascular', 'Zona de descanso'] },
-  ];
+  parks: Park[] = [];
+  error = '';
 
-  goToPark(park: any) {
+  constructor(private parkService: ParkService) {}
+
+  ngOnInit() {
+    this.parkService.getParks().subscribe({
+      next: (parks) => this.parks = parks,
+      error: (err) => this.error = typeof err === 'string' ? err : 'No fue posible cargar los parques'
+    });
+  }
+
+  goToPark(park: Park) {
     alert(`Navegando a ${park.name}... (implementa mapa real aquí)`);
   }
 }
