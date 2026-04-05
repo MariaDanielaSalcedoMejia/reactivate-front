@@ -2,6 +2,11 @@ import { BootstrapContext, bootstrapApplication } from '@angular/platform-browse
 import { App } from './app/app';
 import { config } from './app/app.config.server';
 
+// Set API URL globally for SSR
+if (typeof global !== 'undefined') {
+  (global as any).__API_URL__ = process.env['VITE_API_URL'] || 'https://reactivate-back.onrender.com';
+}
+
 const bootstrap = (context: BootstrapContext) =>
     bootstrapApplication(App, config, context);
 

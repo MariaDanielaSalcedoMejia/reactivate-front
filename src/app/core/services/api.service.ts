@@ -1,12 +1,13 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
+import { API_CONFIG } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = `${import.meta.env['VITE_API_URL'] || 'https://reactivate-back.onrender.com'}/api`;
+  private readonly baseUrl = `${API_CONFIG.baseUrl}/api`;
 
   constructor(private http: HttpClient) {}
 
