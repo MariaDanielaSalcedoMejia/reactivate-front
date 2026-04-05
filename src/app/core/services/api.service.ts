@@ -6,7 +6,7 @@ import { catchError, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = `${import.meta.env['VITE_API_URL']}/api`;
+  private readonly baseUrl = `${import.meta.env['VITE_API_URL'] || 'https://reactivate-back.onrender.com'}/api`;
 
   constructor(private http: HttpClient) {}
 
