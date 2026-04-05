@@ -1,0 +1,125 @@
+:host {
+  display: block;
+  color: #2d0f86;
+  background: #f8f7ff;
+  min-height: 100dvh;
+  padding: 1rem 1.25rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.parks-hero {
+  margin-bottom: 1rem;
+}
+
+.parks-hero h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  color: #3b0a7f;
+}
+
+.parks-hero p {
+  margin: 0.35rem 0 0;
+  color: #5e4ea1;
+}
+
+.map-card {
+  background: linear-gradient(170deg, #ebfff3 5%, #f1f6ff 100%);
+  border: 1px solid #dcdff6;
+  border-radius: 14px;
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.map-placeholder {
+  border: 2px dashed #9c93f0;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #5a46a7;
+  background: #fff;
+}
+
+.map-placeholder span {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  font-size: 1.1rem;
+}
+
+.map-placeholder small {
+  color: #8076a3;
+}
+
+.parks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+}
+
+.park-card {
+  border: 1px solid #e6e2ff;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 10px 18px rgba(107, 69, 194, 0.07);
+}
+
+.park-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.park-heading h3 {
+  margin: 0;
+  color: #4d1886;
+}
+
+.rating {
+  background: #f6f3ff;
+  color: #64209e;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.address,
+.distance {
+  margin: 0;
+  color: #5c4a8a;
+  font-size: 0.92rem;
+}
+
+.tags {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin: 0.6rem 0 0.85rem;
+}
+
+.tag {
+  background: #f3eeff;
+  color: #6244a9;
+  border-radius: 999px;
+  padding: 0.23rem 0.55rem;
+  font-size: 0.78rem;
+}
+
+button {
+  width: 100%;
+  background: linear-gradient(125deg, #5a16cb, #962bdd);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.72rem 0;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}

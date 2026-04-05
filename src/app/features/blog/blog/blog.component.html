@@ -1,0 +1,39 @@
+<div class="health-hero">
+  <h1>Blog Fitness</h1>
+  <p>Comparte tus experiencias y motiva a otros 💬</p>
+</div>
+
+<!-- 📝 CREAR POST -->
+<div class="post-box">
+
+  <textarea
+    [(ngModel)]="mensaje"
+    placeholder="¿Qué hiciste hoy? ¿Cómo te sentiste?"
+  ></textarea>
+
+  <div class="actions">
+    <button (click)="publicar()">Publicar</button>
+  </div>
+
+</div>
+
+<!-- 📰 FEED -->
+<div class="feed">
+
+  <div class="post-card" *ngFor="let post of posts">
+
+    <div class="post-header">
+      <div class="avatar">👤</div>
+      <div>
+        <strong>Usuario</strong>
+        <small>{{ post.fecha }}</small>
+      </div>
+    </div>
+
+    <p class="post-text">{{ post.texto }}</p>
+
+  </div>
+
+
+</div>
+

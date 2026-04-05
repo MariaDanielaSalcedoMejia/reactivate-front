@@ -1,0 +1,50 @@
+<div class="health-hero">
+</div>
+
+<!-- FILTRO -->
+<div class="segmentos">
+
+  <!-- TODOS -->
+  <div class="segmento"
+       [class.active]="filtroActivo === 'todos'"
+       (click)="seleccionarFiltro('todos')">
+
+    <div class="icono">🌐</div>
+    <span>Todos</span>
+
+  </div>
+
+  <!-- DEMÁS -->
+  <div class="segmento"
+       *ngFor="let s of segmentos"
+       [class.active]="filtroActivo === s.nombre"
+       (click)="seleccionarFiltro(s.nombre)">
+
+    <div class="icono">{{ s.icono }}</div>
+    <span>{{ s.label }}</span>
+
+  </div>
+
+</div>
+
+<!-- GRID DINÁMICO -->
+<div class="grid">
+
+  <div class="card" *ngFor="let e of ejerciciosFiltrados">
+
+    <div class="image"
+         [style.backgroundImage]="'url(' + e.imagen + ')'">
+    </div>
+
+    <div class="content">
+      <h3>{{ e.nombre }}</h3>
+      <p>{{ e.descripcion }}</p>
+
+      <div class="parque">
+        📍 {{ e.parque }}
+      </div>
+    </div>
+
+  </div>
+
+</div>

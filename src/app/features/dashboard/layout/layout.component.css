@@ -1,0 +1,54 @@
+.layout {
+  min-height: 100dvh;
+  background: #f7f7ff;
+}
+
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(90deg, #3a0d81, #7d40ff);
+  color: white;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.links a:hover {
+  opacity: 1;
+}
+
+.user-section {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.user-section button {
+  background: #ff4d6d;
+  border: none;
+  color: white;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+

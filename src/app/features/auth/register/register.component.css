@@ -1,0 +1,125 @@
+:host {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1rem;
+}
+
+/* CARD */
+.card {
+  width: min(92vw, 400px);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  padding: 1.6rem 1.4rem;
+  backdrop-filter: blur(6px);
+  text-align: center;
+}
+
+/* LOGO */
+.logo {
+  font-size: 2rem;
+  color: #4f46e5;
+  margin-bottom: 0.4rem;
+}
+
+/* TITULO */
+h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+/* SUBTEXTO */
+.sub {
+  color: #6b7280;
+  margin: 0.3rem 0 1rem;
+  font-size: 0.9rem;
+}
+
+/* FORM */
+form {
+  display: grid;
+  gap: 0.7rem;
+  text-align: left;
+}
+
+/* LABEL */
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border: 1.5px solid #d1d5db;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  outline: none;
+}
+
+/* BOTÓN */
+button {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(125deg, #4f46e5, #7c3aed);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.25);
+}
+
+/* LINK */
+.link {
+  display: block;
+  text-align: center;
+  margin-top: 0.8rem;
+  color: #4f46e5;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* NOTA */
+.note {
+  font-size: 0.8rem;
+  margin-top: 0.6rem;
+  color: #555;
+}
+
+.note a {
+  color: #6616f2;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* MOBILE */
+@media (max-width: 480px) {
+  .card {
+    padding: 1.2rem;
+  }
+}

@@ -1,0 +1,30 @@
+<div class="layout">
+
+  <!-- NAVBAR MODERNA -->
+  <nav class="navbar">
+
+    <div class="logo">
+      💜 Reactivate
+    </div>
+
+    <div class="links">
+      <a routerLink="/app">Inicio</a>
+      <a routerLink="/app/health">Salud</a>
+      <a routerLink="/app/exercises">Ejercicios</a>
+      <a routerLink="/app/blog">Blog</a>
+      <a routerLink="/app/forum">Foro</a>
+      <a routerLink="/app/parks">Parques</a>
+    </div>
+
+    <div class="user-section">
+      <span>Hola {{ user?.name || user?.email }} 👋</span>
+      <button (click)="logout()">Salir</button>
+    </div>
+
+  </nav>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

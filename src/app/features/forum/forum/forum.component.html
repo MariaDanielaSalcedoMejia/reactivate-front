@@ -1,0 +1,68 @@
+<div class="forum-hero">
+  <h1>Foro Comunitario</h1>
+  <p>Comparte experiencias, consejos y motiva a otros en su camino hacia una vida más activa</p>
+</div>
+
+<div class="forum-content">
+  <div class="forum-stats">
+    <div class="stat-card">
+      <div class="stat-number">{{ forumStats.totalPosts }}</div>
+      <div class="stat-label">Publicaciones</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ forumStats.activeUsers }}</div>
+      <div class="stat-label">Usuarios Activos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ forumStats.totalTopics }}</div>
+      <div class="stat-label">Temas</div>
+    </div>
+  </div>
+
+  <div class="forum-categories">
+    <h2>Categorías</h2>
+    <div class="categories-grid">
+      <div class="category-card" *ngFor="let category of categories">
+        <div class="category-icon">{{ category.icon }}</div>
+        <div class="category-content">
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.description }}</p>
+          <div class="category-stats">
+            <span>{{ category.posts }} publicaciones</span>
+            <span>{{ category.topics }} temas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="recent-posts">
+    <h2>Publicaciones Recientes</h2>
+    <div class="posts-list">
+      <div class="post-card" *ngFor="let post of recentPosts">
+        <div class="post-header">
+          <div class="post-author">
+            <div class="author-avatar">{{ post.author.charAt(0).toUpperCase() }}</div>
+            <div class="author-info">
+              <div class="author-name">{{ post.author }}</div>
+              <div class="post-time">{{ post.timeAgo }}</div>
+            </div>
+          </div>
+          <div class="post-category">{{ post.category }}</div>
+        </div>
+        <div class="post-content">
+          <h4>{{ post.title }}</h4>
+          <p>{{ post.excerpt }}</p>
+        </div>
+        <div class="post-footer">
+          <div class="post-stats">
+            <span>👍 {{ post.likes }}</span>
+            <span>💬 {{ post.replies }}</span>
+          </div>
+          <button class="read-more-btn" (click)="readPost(post.id)">Leer más</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

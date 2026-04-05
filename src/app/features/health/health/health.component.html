@@ -1,0 +1,83 @@
+<div class="health-hero">
+  <h1>Health & Performance</h1>
+  <p>Optimiza tu rendimiento como atleta</p>
+</div>
+
+<!-- FORM -->
+<div class="progress-card">
+  <h2>Datos personales</h2>
+
+  <div class="form-grid">
+
+    <div class="input-group">
+      <input type="number" [(ngModel)]="edad" placeholder="Edad">
+    </div>
+
+    <div class="input-group">
+      <input type="number" [(ngModel)]="peso" placeholder="Peso (kg)">
+    </div>
+
+    <div class="input-group">
+      <input type="number" [(ngModel)]="altura" placeholder="Altura (cm)">
+    </div>
+
+    <div class="input-group">
+      <input type="number" [(ngModel)]="fcReposo" placeholder="FC reposo (ppm)">
+      <small>Míde al despertar los latidos por, en reposo total</small>
+      <small *ngIf="fcReposo">{{ mensajeFcReposo }}</small>
+    </div>
+
+  </div>
+
+  <button (click)="calcular()">Analizar</button>
+</div>
+
+<!-- SCORE -->
+<div class="goal-card" *ngIf="score">
+  <h2>Score Fitness: {{ score }}/100</h2>
+  <p>{{ nivel }}</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid" *ngIf="imc !== null">
+
+  <div class="stat-card">
+    <h3>IMC</h3>
+    <p>{{ imc | number:'1.1-1' }}</p>
+    <small>{{ imcCategoria }}</small>
+    <small class="info">Relación peso/altura</small>
+  </div>
+
+  <div class="stat-card">
+    <h3>FC Máxima</h3>
+    <p>{{ fcMax }}</p>
+    <small>ppm</small>
+  </div>
+
+  <div class="stat-card">
+    <h3>Reserva</h3>
+    <p>{{ reserva }}</p>
+    <small>Karvonen</small>
+  </div>
+</div>
+
+<!-- ZONAS -->
+<div class="progress-card" *ngIf="fcMax !== null">
+  <h2>Zonas de entrenamiento</h2>
+
+  <div *ngFor="let zona of zonas">
+    <div class="progress-row">
+      <span>{{ zona.nombre }}</span>
+      <span>{{ zona.min }} - {{ zona.max }}</span>
+    </div>
+    <div class="progress-bar">
+      <span [style.width.%]="zona.porcentaje"></span>
+    </div>
+  </div>
+</div>
+
+<!-- RECOMENDACIÓN -->
+<div class="goal-card" *ngIf="imc !== null">
+  <h2>Recomendación</h2>
+  <p>{{ recomendacion }}</p>
+</div>

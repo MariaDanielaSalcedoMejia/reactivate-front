@@ -1,0 +1,30 @@
+<section class="parks-hero">
+  <h1>Parques Cercanos</h1>
+  <p>Encuentra espacios verdes para tu actividad física</p>
+</section>
+
+<section class="map-card">
+  <div class="map-placeholder">
+    <span>Mapa interactivo</span>
+    <small>Aquí se mostraría un mapa real con tu ubicación y parques cercanos</small>
+  </div>
+</section>
+
+<section class="parks-grid">
+  <article class="park-card" *ngFor="let park of parks">
+    <div class="park-heading">
+      <h3>{{ park.name }}</h3>
+      <span class="rating">★ {{ park.rating.toFixed(1) }}</span>
+    </div>
+    <p class="address">📍 {{ park.address }}</p>
+    <p class="distance">🚶 {{ park.distance }} de distancia</p>
+
+    <p>{{ park.name }} es un espacio ideal para tus entrenamientos suaves y caminatas.</p>
+
+    <div class="tags">
+      <span class="tag" *ngFor="let feature of park.features">{{ feature }}</span>
+    </div>
+
+    <button type="button" (click)="goToPark(park)">Cómo llegar</button>
+  </article>
+</section>

@@ -1,0 +1,57 @@
+<section class="login-area">
+  <div class="card">
+    <div class="logo">↯</div>
+    <h2>Únete a ReActívate</h2>
+    <p class="sub">Crea tu cuenta y comienza tu viaje de bienestar</p>
+
+    <form (ngSubmit)="register()" #registerForm="ngForm" novalidate>
+      <label for="fullName">Nombre completo</label>
+      <input
+        id="fullName"
+        name="fullName"
+        type="text"
+        [(ngModel)]="fullName"
+        required
+        minlength="2"
+        placeholder="Ej. Ana María"
+      />
+
+      <label for="age">Edad</label>
+      <input
+        id="age"
+        name="age"
+        type="number"
+        [(ngModel)]="age"
+        required
+        min="18"
+        max="120"
+        placeholder="40"
+      />
+
+      <label for="email">Correo electrónico</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        [(ngModel)]="email"
+        required
+        placeholder="ejemplo@gmail.com"
+      />
+
+      <label for="password">Contraseña</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        [(ngModel)]="password"
+        required
+        minlength="6"
+        placeholder="Contraseña"
+      />
+
+      <button type="submit" [disabled]="!registerForm.form.valid">Crear cuenta</button>
+    </form>
+
+    <p class="note">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a></p>
+  </div>
+</section>
