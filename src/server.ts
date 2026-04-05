@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(/^\/api\//, async (req, res) => {
   const backendUrl = new URL(`https://reactivate-back.onrender.com${req.originalUrl}`);
-  
+
   const proxyOptions: any = {
     method: req.method,
     headers: {
@@ -36,12 +36,12 @@ app.use(/^\/api\//, async (req, res) => {
   try {
     const response = await fetch(backendUrl.toString(), proxyOptions);
     const data = await response.arrayBuffer();
-    
+
     res.status(response.status);
     response.headers.forEach((value, name) => {
       res.setHeader(name, value);
     });
-    
+
     res.send(Buffer.from(data));
   } catch (error) {
     console.error('Proxy error:', error);
