@@ -1,15 +1,15 @@
 // Environment configuration
 export class ApiConfig {
   static getBaseUrl(): string {
-    // Browser environment
+    // Browser environment - use relative path (Express will proxy it)
     if (typeof window !== 'undefined') {
-      return (window as any).__API_URL__ || 'https://reactivate-back.onrender.com';
+      return '';  // Relative to same origin
     }
-    // SSR environment
+    // SSR environment - use absolute URL for internal requests
     if (typeof global !== 'undefined') {
-      return (global as any).__API_URL__ || 'https://reactivate-back.onrender.com';
+      return 'https://reactivate-back.onrender.com';
     }
-    return 'https://reactivate-back.onrender.com';
+    return '';
   }
 }
 
