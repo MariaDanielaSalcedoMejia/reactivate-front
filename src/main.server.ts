@@ -4,7 +4,7 @@ import { config } from './app/app.config.server';
 
 // Set API URL globally for SSR
 if (typeof global !== 'undefined') {
-  (global as any).__API_URL__ = process.env['VITE_API_URL'] || 'https://reactivate-back.onrender.com';
+  (global as any).__API_URL__ = 'https://reactivate-back.onrender.com';
 }
 
 const bootstrap = (context: BootstrapContext) =>

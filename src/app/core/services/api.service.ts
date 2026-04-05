@@ -7,9 +7,11 @@ import { API_CONFIG } from '../config/api.config';
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = `${API_CONFIG.baseUrl}/api`;
-
   constructor(private http: HttpClient) {}
+
+  private get baseUrl() {
+    return `${API_CONFIG.baseUrl}/api`;
+  }
 
   get<T>(path: string) {
     return this.http.get<T>(`${this.baseUrl}${path}`).pipe(catchError(this.handleError));
