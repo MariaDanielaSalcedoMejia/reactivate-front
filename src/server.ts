@@ -6,7 +6,6 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
-import httpProxy from 'express-http-proxy';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -16,7 +15,39 @@ const angularApp = new AngularNodeAppEngine();
 /**
  * Proxy API requests to backend
  */
-app.use('/api', httpProxy('https://reactivate-back.onrender.com'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(/^\/api\//, async (req, res) => {
+  const backendUrl = new URL(`https://reactivate-back.onrender.com${req.originalUrl}`);
+  
+  const proxyOptions: any = {
+    method: req.method,
+    headers: {
+      ...req.headers,
+      'host': 'reactivate-back.onrender.com',
+    },
+  };
+
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    proxyOptions.body = JSON.stringify(req.body);
+  }
+
+  try {
+    const response = await fetch(backendUrl.toString(), proxyOptions);
+    const data = await response.arrayBuffer();
+    
+    res.status(response.status);
+    response.headers.forEach((value, name) => {
+      res.setHeader(name, value);
+    });
+    
+    res.send(Buffer.from(data));
+  } catch (error) {
+    console.error('Proxy error:', error);
+    res.status(500).send('Proxy error');
+  }
+});
 
 /**
  * Serve static files from /browser
