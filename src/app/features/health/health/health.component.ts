@@ -39,34 +39,48 @@ export class HealthComponent {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    if (this.user) {
+
+    console.log('👤 USER AL INICIAR:', this.user); // DEBUG
+
+    if (this.user && this.user.id) {
       this.loadProfile();
     }
   }
 
-loadProfile() {
-  if (!this.user || !this.user.id) {
-    console.warn('Usuario no válido');
-    return;
-  }
-
-  this.healthService.getProfile(this.user.id).subscribe({
-    next: (profile) => this.applyProfile(profile),
-    error: (err) => {
-      console.warn('No hay perfil aún o backend falló', err);
+  loadProfile() {
+    if (!this.user || !this.user.id) {
+      console.warn('⚠️ Usuario no válido para cargar perfil');
+      return;
     }
-  });
-}
+
+    this.healthService.getProfile(this.user.id).subscribe({
+      next: (profile) => {
+        if (profile) {
+          this.applyProfile(profile);
+        }
+      },
+      error: (err) => {
+        console.warn('⚠️ No hay perfil aún o backend falló', err);
+      }
+    });
+  }
 
   calcular() {
     this.error = '';
+
+    console.log('👤 USER AL CALCULAR:', this.user); // DEBUG
+
+    if (!this.user || !this.user.id) {
+      this.error = 'Usuario no válido. Inicia sesión nuevamente.';
+      return;
+    }
 
     if (!this.edad || !this.peso || !this.altura || !this.fcReposo) {
       this.error = 'Completa todos los campos';
       return;
     }
 
-    // 🔥 CALCULO LOCAL INMEDIATO
+    // 🔥 CALCULO LOCAL (INMEDIATO)
     const imcLocal = this.peso / Math.pow(this.altura / 100, 2);
     this.imc = Number(imcLocal.toFixed(1));
     this.imcCategoria = this.getImcCategoria(this.imc);
@@ -79,19 +93,17 @@ loadProfile() {
     this.nivel = 'Analizando...';
     this.recomendacion = 'Procesando datos...';
 
-    // 🔄 BACKEND (si existe usuario)
-    if (!this.user) return;
-
+    // 🔄 BACKEND
     this.healthService.saveProfile(this.user.id, this.altura, this.peso, this.fcReposo)
       .subscribe({
         next: (profile) => {
-          console.log('✅ Backend:', profile);
+          console.log('✅ RESPUESTA BACKEND:', profile);
           this.applyProfile(profile);
         },
         error: (err) => {
-          console.warn('⚠️ Backend falló, usando cálculo local');
-          console.error(err);
+          console.error('🔥 ERROR BACKEND:', err);
 
+          // fallback local
           this.nivel = this.getNivelLocal();
           this.recomendacion = this.getRecomendacionLocal();
         }
