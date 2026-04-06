@@ -44,16 +44,19 @@ export class HealthComponent {
     }
   }
 
-  loadProfile() {
-    if (!this.user) return;
-
-    this.healthService.getProfile(this.user.id).subscribe({
-      next: (profile) => this.applyProfile(profile),
-      error: () => {
-        console.warn('Sin perfil previo');
-      }
-    });
+loadProfile() {
+  if (!this.user || !this.user.id) {
+    console.warn('Usuario no válido');
+    return;
   }
+
+  this.healthService.getProfile(this.user.id).subscribe({
+    next: (profile) => this.applyProfile(profile),
+    error: (err) => {
+      console.warn('No hay perfil aún o backend falló', err);
+    }
+  });
+}
 
   calcular() {
     this.error = '';
