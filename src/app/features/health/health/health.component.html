@@ -23,7 +23,7 @@
 
     <div class="input-group">
       <input type="number" [(ngModel)]="fcReposo" placeholder="FC reposo (ppm)">
-      <small>Míde al despertar los latidos por, en reposo total</small>
+      <small>Mide al despertar en reposo total</small>
       <small *ngIf="fcReposo">{{ mensajeFcReposo }}</small>
     </div>
 
@@ -34,9 +34,16 @@
 </div>
 
 <!-- SCORE -->
-<div class="goal-card" *ngIf="score">
-  <h2>Score Fitness: {{ score }}/100</h2>
-  <p>{{ nivel }}</p>
+<div class="goal-card" *ngIf="imc !== null">
+  <h2>Score Fitness: {{ score || 0 }}/100</h2>
+
+  <p *ngIf="nivel; else loadingNivel">
+    {{ nivel }}
+  </p>
+
+  <ng-template #loadingNivel>
+    <p>Analizando tu rendimiento...</p>
+  </ng-template>
 </div>
 
 <!-- STATS -->
@@ -60,10 +67,11 @@
     <p>{{ reserva }}</p>
     <small>Karvonen</small>
   </div>
+
 </div>
 
 <!-- ZONAS -->
-<div class="progress-card" *ngIf="fcMax !== null">
+<div class="progress-card" *ngIf="zonas.length">
   <h2>Zonas de entrenamiento</h2>
 
   <div *ngFor="let zona of zonas">
@@ -80,5 +88,12 @@
 <!-- RECOMENDACIÓN -->
 <div class="goal-card" *ngIf="imc !== null">
   <h2>Recomendación</h2>
-  <p>{{ recomendacion }}</p>
+
+  <p *ngIf="recomendacion; else loadingRec">
+    {{ recomendacion }}
+  </p>
+
+  <ng-template #loadingRec>
+    <p>Generando recomendaciones...</p>
+  </ng-template>
 </div>
