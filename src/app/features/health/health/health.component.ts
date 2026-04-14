@@ -267,6 +267,9 @@ export class HealthComponent {
     } catch (e) {
       console.error('Error parsing analysis data:', e);
     }
+
+    // Mostrar análisis completo en consola
+    this.printDetailedAnalysis(this.lastAnalysis);
   }
 
   getImcCategoria(imc: number) {
@@ -350,6 +353,34 @@ export class HealthComponent {
     return 'bajo';
   }
 
+  // ==================== MÉTODOS AUXILIARES PARA PARSEAR DATOS ====================
+
+  getWarningsArray(): string[] {
+    if (!this.lastAnalysis || !this.lastAnalysis.warnings) return [];
+    try {
+      const warnings = typeof this.lastAnalysis.warnings === 'string'
+        ? JSON.parse(this.lastAnalysis.warnings)
+        : this.lastAnalysis.warnings;
+      return Array.isArray(warnings) ? warnings : [];
+    } catch (e) {
+      console.error('Error parsing warnings:', e);
+      return [];
+    }
+  }
+
+  getSuggestionsArray(): string[] {
+    if (!this.lastAnalysis || !this.lastAnalysis.suggestions) return [];
+    try {
+      const suggestions = typeof this.lastAnalysis.suggestions === 'string'
+        ? JSON.parse(this.lastAnalysis.suggestions)
+        : this.lastAnalysis.suggestions;
+      return Array.isArray(suggestions) ? suggestions : [];
+    } catch (e) {
+      console.error('Error parsing suggestions:', e);
+      return [];
+    }
+  }
+
   getImcClass(imc: number): string {
     if (imc < 18.5) return 'bajo';
     if (imc < 25) return 'optimo';
@@ -370,6 +401,152 @@ export class HealthComponent {
 
     const largeArc = this.score > 50 ? 1 : 0;
     return `M 75,25 A 50,50 0 ${largeArc} 1 ${x},${y}`;
+  }
+
+  // ==================== MÉTODOS AUXILIARES PARA PARSEAR DATOS ====================
+
+  getWarningsArray(): string[] {
+    if (!this.lastAnalysis || !this.lastAnalysis.warnings) return [];
+    try {
+      const warnings = typeof this.lastAnalysis.warnings === 'string'
+        ? JSON.parse(this.lastAnalysis.warnings)
+        : this.lastAnalysis.warnings;
+      return Array.isArray(warnings) ? warnings : [];
+    } catch (e) {
+      console.error('Error parsing warnings:', e);
+      return [];
+    }
+  }
+
+  getSuggestionsArray(): string[] {
+    if (!this.lastAnalysis || !this.lastAnalysis.suggestions) return [];
+    try {
+      const suggestions = typeof this.lastAnalysis.suggestions === 'string'
+        ? JSON.parse(this.lastAnalysis.suggestions)
+        : this.lastAnalysis.suggestions;
+      return Array.isArray(suggestions) ? suggestions : [];
+    } catch (e) {
+      console.error('Error parsing suggestions:', e);
+      return [];
+    }
+  }
+
+  printDetailedAnalysis(analysis: HealthAnalysis) {
+    console.group('%c🏥 ANÁLISIS DE SALUD DETALLADO', 'color: #E91E63; font-size: 14px; font-weight: bold;');
+
+    console.group('%c👤 INFORMACIÓN PERSONAL', 'color: #00BCD4; font-weight: bold;');
+    console.log('Altura:', analysis.height_cm, 'cm');
+    console.log('Peso:', analysis.weight_kg, 'kg');
+    console.log('Edad:', analysis.age, 'años');
+    console.log('FC en reposo:', analysis.resting_hr, 'bpm');
+    console.groupEnd();
+
+    console.group('%c💪 ÍNDICES DE SALUD', 'color: #8BC34A; font-weight: bold;');
+    console.log('IMC:', analysis.imc.toFixed(2), '(' + analysis.imc_category + ')');
+    console.log('Score de Salud:', analysis.score, '/100');
+    console.log('Nivel:', analysis.level);
+    console.groupEnd();
+
+    console.group('%c❤️ FRECUENCIA CARDÍACA', 'color: #f44336; font-weight: bold;');
+    console.log('FC Máxima:', analysis.max_hr, 'bpm');
+    console.log('Reserva Cardíaca:', analysis.heart_reserve, 'bpm');
+    console.table({
+      'Recuperación (50%)': analysis.recovery_zone_min + ' - ' + analysis.recovery_zone_max + ' bpm',
+      'Aeróbica (65%)': analysis.aerobic_zone_min + ' - ' + analysis.aerobic_zone_max + ' bpm',
+      'Rendimiento (80%)': analysis.performance_zone_min + ' - ' + analysis.performance_zone_max + ' bpm'
+    });
+    console.groupEnd();
+
+    console.group('%c📋 RESUMEN DE SALUD', 'color: #FF6F00; font-weight: bold;');
+    console.log(analysis.health_summary);
+    console.groupEnd();
+
+    if (analysis.warnings) {
+      console.group('%c⚠️ ALERTAS', 'color: #FF5722; font-weight: bold;');
+      try {
+        const warnings = this.getWarningsArray();
+        warnings.forEach((warning, index) => {
+          console.warn(`[${index + 1}]`, warning);
+        });
+      } catch (e) {
+        console.warn(analysis.warnings);
+      }
+      console.groupEnd();
+    }
+
+    if (analysis.suggestions) {
+      console.group('%c💡 SUGERENCIAS', 'color: #4CAF50; font-weight: bold;');
+      try {
+        const suggestions = this.getSuggestionsArray();
+        suggestions.forEach((suggestion, index) => {
+          console.log(`[${index + 1}]`, suggestion);
+        });
+      } catch (e) {
+        console.log(analysis.suggestions);
+      }
+      console.groupEnd();
+    }
+
+    console.log('%c📅 Análisis realizado:', 'color: #607D8B; font-weight: bold;', this.getDateFormat(analysis.created_at));
+    console.groupEnd();
+  }
+    console.log('Peso:', analysis.weight_kg, 'kg');
+    console.log('Edad:', analysis.age, 'años');
+    console.log('FC en reposo:', analysis.resting_hr, 'bpm');
+    console.groupEnd();
+
+    console.group('%c💪 ÍNDICES DE SALUD', 'color: #8BC34A; font-weight: bold;');
+    console.log('IMC:', analysis.imc.toFixed(2), '(' + analysis.imc_category + ')');
+    console.log('Score de Salud:', analysis.score, '/100');
+    console.log('Nivel:', analysis.level);
+    console.groupEnd();
+
+    console.group('%c❤️ FRECUENCIA CARDÍACA', 'color: #f44336; font-weight: bold;');
+    console.log('FC Máxima:', analysis.max_hr, 'bpm');
+    console.log('Reserva Cardíaca:', analysis.heart_reserve, 'bpm');
+    console.table({
+      'Recuperación (50%)': analysis.recovery_zone_min + ' - ' + analysis.recovery_zone_max + ' bpm',
+      'Aeróbica (65%)': analysis.aerobic_zone_min + ' - ' + analysis.aerobic_zone_max + ' bpm',
+      'Rendimiento (80%)': analysis.performance_zone_min + ' - ' + analysis.performance_zone_max + ' bpm'
+    });
+    console.groupEnd();
+
+    console.group('%c📋 RESUMEN DE SALUD', 'color: #FF6F00; font-weight: bold;');
+    console.log(analysis.health_summary);
+    console.groupEnd();
+
+    if (analysis.warnings) {
+      console.group('%c⚠️ ALERTAS Y ADVERTENCIAS', 'color: #FF5722; font-weight: bold;');
+      try {
+        const warnings = typeof analysis.warnings === 'string' ? JSON.parse(analysis.warnings) : analysis.warnings;
+        if (Array.isArray(warnings)) {
+          warnings.forEach((warning, index) => {
+            console.warn(`[${index + 1}]`, warning);
+          });
+        }
+      } catch (e) {
+        console.warn(analysis.warnings);
+      }
+      console.groupEnd();
+    }
+
+    if (analysis.suggestions) {
+      console.group('%c💡 SUGERENCIAS Y RECOMENDACIONES', 'color: #4CAF50; font-weight: bold;');
+      try {
+        const suggestions = typeof analysis.suggestions === 'string' ? JSON.parse(analysis.suggestions) : analysis.suggestions;
+        if (Array.isArray(suggestions)) {
+          suggestions.forEach((suggestion, index) => {
+            console.log(`[${index + 1}]`, suggestion);
+          });
+        }
+      } catch (e) {
+        console.log(analysis.suggestions);
+      }
+      console.groupEnd();
+    }
+
+    console.log('%c📅 Análisis realizado el:', 'color: #607D8B; font-weight: bold;', this.getDateFormat(analysis.created_at));
+    console.groupEnd();
   }
 }
 

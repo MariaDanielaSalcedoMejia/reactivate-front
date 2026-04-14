@@ -1,1 +1,163 @@
-:host{display:block;padding:1rem;background:#f5f0ff;min-height:100vh}h1{font-size:2rem;color:#3a0d81;margin:0 0 .5rem;font-weight:700}h2{color:#3a0d81;margin:.8rem 0;font-size:1.1rem}p{color:#6a53a6;margin:0}.progress-card{background:#fff;border:1px solid #e9e7ff;border-radius:8px;padding:1rem;margin-bottom:.8rem}form{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.6rem;margin-bottom:.8rem}input,button{padding:.5rem;border-radius:6px;font-size:.9rem}input{border:1px solid #ddd;background:#fafbff}button{background:#7234c1;color:#fff;border:0;cursor:pointer;font-weight:600}.error{color:#c62828;background:#ffebee;padding:.5rem;border-radius:4px;margin:.5rem 0;font-size:.9rem}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.8rem;margin:.8rem 0}.stat-card{background:#fff;border:1px solid #e9e7ff;border-radius:8px;padding:.8rem;text-align:center}.stat-value{font-size:1.6rem;font-weight:700;color:#7234c1}.stat-label{font-size:.8rem;color:#999}.zones-card,.rec-card,.history-card{background:#fff;border-radius:8px;padding:.8rem;margin:.6rem 0}.zone-item{background:#f9f9ff;padding:.5rem;border-radius:6px;margin:.3rem 0;border-left:2px solid #7234c1;font-size:.9rem}.rec-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}.rec-item{background:#e8f5e9;padding:.5rem;border-radius:6px;font-size:.8rem;border-left:2px solid #4CAF50}.badge{display:inline-block;background:#e9e7ff;color:#7234c1;padding:.2rem .5rem;border-radius:4px;font-size:.8rem;font-weight:600}@media (max-width:768px){:host{padding:.5rem}h1{font-size:1.5rem}form{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+:host{display:block;padding:1rem;background:#f5f0ff;min-height:100vh}h1{font-size:2rem;color:#3a0d81;margin:0 0 .5rem;font-weight:700}h2{color:#3a0d81;margin:.8rem 0;font-size:1.1rem}p{color:#6a53a6;margin:0}.progress-card{background:#fff;border:1px solid #e9e7ff;border-radius:8px;padding:1rem;margin-bottom:.8rem}form{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.6rem;margin-bottom:.8rem}input,button{padding:.5rem;border-radius:6px;font-size:.9rem}input{border:1px solid #ddd;background:#fafbff}button{background:#7234c1;color:#fff;border:0;cursor:pointer;font-weight:600}.error{color:#c62828;background:#ffebee;padding:.5rem;border-radius:4px;margin:.5rem 0;font-size:.9rem}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.8rem;margin:.8rem 0}.stat-card{background:#fff;border:1px solid #e9e7ff;border-radius:8px;padding:.8rem;text-align:center}.stat-value{font-size:1.6rem;font-weight:700;color:#7234c1}.stat-label{font-size:.8rem;color:#999}.zones-card,.rec-card,.history-card{background:#fff;border-radius:8px;padding:.8rem;margin:.6rem 0}.zone-item{background:#f9f9ff;padding:.5rem;border-radius:6px;margin:.3rem 0;border-left:2px solid #7234c1;font-size:.9rem}.rec-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}.rec-item{background:#e8f5e9;padding:.5rem;border-radius:6px;font-size:.8rem;border-left:2px solid #4CAF50}.badge{display:inline-block;background:#e9e7ff;color:#7234c1;padding:.2rem .5rem;border-radius:4px;font-size:.8rem;font-weight:600}
+
+/* Estilos para análisis del backend */
+.analysis-backend-card {
+  background: linear-gradient(135deg, #fff 0%, #f9f7ff 100%);
+  border: 2px solid #7234c1;
+  box-shadow: 0 4px 12px rgba(114, 52, 193, 0.1);
+}
+
+.analysis-section {
+  background: #f9f7ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid #7234c1;
+}
+
+.analysis-section h3 {
+  color: #7234c1;
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.analysis-item {
+  background: #fff;
+  border-radius: 6px;
+  padding: 0.8rem;
+  text-align: center;
+  border: 1px solid #e9e7ff;
+}
+
+.analysis-item .label {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.3rem;
+}
+
+.analysis-item .value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #7234c1;
+}
+
+.analysis-item .category {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+
+.heart-zones-table {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e9e7ff;
+}
+
+.zone-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #e9e7ff;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.zone-row:last-child {
+  border-bottom: none;
+}
+
+.zone-row.header {
+  background: #7234c1;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+}
+
+.zone-row.recovery {
+  background: rgba(76, 175, 80, 0.05);
+  border-left: 4px solid #4CAF50;
+}
+
+.zone-row.aerobic {
+  background: rgba(33, 150, 243, 0.05);
+  border-left: 4px solid #2196F3;
+}
+
+.zone-row.performance {
+  background: rgba(255, 152, 0, 0.05);
+  border-left: 4px solid #FF9800;
+}
+
+.analysis-info {
+  background: #fff;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #e9e7ff;
+}
+
+.health-summary-text {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #FF6F00;
+}
+
+.health-summary-text p {
+  margin: 0.5rem 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.backend-warning-list,
+.backend-suggestion-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.backend-warning-item,
+.backend-suggestion-item {
+  background: #fff;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
+  border-left: 4px solid;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.backend-warning-item {
+  border-left-color: #FF5722;
+  background: rgba(255, 87, 34, 0.05);
+}
+
+.backend-suggestion-item {
+  border-left-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.analysis-footer {
+  background: #f0f0f0;
+  padding: 0.8rem;
+  border-radius: 6px;
+  text-align: center;
+  color: #888;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+@media (max-width:768px){:host{padding:.5rem}h1{font-size:1.5rem}form{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}.analysis-grid{grid-template-columns:1fr}.heart-zones-table{overflow-x:auto}}

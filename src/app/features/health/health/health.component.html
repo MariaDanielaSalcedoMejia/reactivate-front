@@ -94,6 +94,117 @@
   </div>
 </div>
 
+<!-- ANÁLISIS COMPLETO DEL BACKEND -->
+<div *ngIf="lastAnalysis && score > 0" class="progress-card analysis-backend-card">
+  <h2>🏥 Análisis Completo de Salud</h2>
+
+  <!-- Información Personal -->
+  <div class="analysis-section">
+    <h3>👤 Información Personal</h3>
+    <div class="analysis-grid">
+      <div class="analysis-item">
+        <span class="label">Altura</span>
+        <span class="value">{{ lastAnalysis.height_cm }} cm</span>
+      </div>
+      <div class="analysis-item">
+        <span class="label">Peso</span>
+        <span class="value">{{ lastAnalysis.weight_kg }} kg</span>
+      </div>
+      <div class="analysis-item">
+        <span class="label">Edad</span>
+        <span class="value">{{ lastAnalysis.age }} años</span>
+      </div>
+      <div class="analysis-item">
+        <span class="label">FC en Reposo</span>
+        <span class="value">{{ lastAnalysis.resting_hr }} bpm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Índices de Salud -->
+  <div class="analysis-section">
+    <h3>💪 Índices de Salud</h3>
+    <div class="analysis-grid">
+      <div class="analysis-item">
+        <span class="label">IMC</span>
+        <span class="value">{{ lastAnalysis.imc | number:'1.2-2' }}</span>
+        <span class="category">{{ lastAnalysis.imc_category }}</span>
+      </div>
+      <div class="analysis-item">
+        <span class="label">Score</span>
+        <span class="value" [style.color]="getScoreColor(lastAnalysis.score)">{{ lastAnalysis.score }}/100</span>
+      </div>
+      <div class="analysis-item">
+        <span class="label">Nivel</span>
+        <span class="value">{{ lastAnalysis.level }}</span>
+      </div>
+      <div class="analysis-item">
+        <span class="label">FC Máxima</span>
+        <span class="value">{{ lastAnalysis.max_hr }} bpm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frecuencia Cardíaca Detallada -->
+  <div class="analysis-section">
+    <h3>❤️ Zonas de Frecuencia Cardíaca</h3>
+    <div class="heart-zones-table">
+      <div class="zone-row header">
+        <span>Zona</span>
+        <span>Rango (bpm)</span>
+        <span>Intensidad</span>
+      </div>
+      <div class="zone-row recovery">
+        <span>🟢 Recuperación</span>
+        <span>{{ lastAnalysis.recovery_zone_min }} - {{ lastAnalysis.recovery_zone_max }}</span>
+        <span>50%</span>
+      </div>
+      <div class="zone-row aerobic">
+        <span>🔵 Aeróbica</span>
+        <span>{{ lastAnalysis.aerobic_zone_min }} - {{ lastAnalysis.aerobic_zone_max }}</span>
+        <span>65%</span>
+      </div>
+      <div class="zone-row performance">
+        <span>🟠 Rendimiento</span>
+        <span>{{ lastAnalysis.performance_zone_min }} - {{ lastAnalysis.performance_zone_max }}</span>
+        <span>80%</span>
+      </div>
+    </div>
+    <div class="analysis-info">
+      <strong>Reserva Cardíaca:</strong> {{ lastAnalysis.heart_reserve }} bpm
+    </div>
+  </div>
+
+  <!-- Resumen de Salud -->
+  <div class="analysis-section">
+    <h3>📋 Resumen de Salud</h3>
+    <div class="health-summary-text">
+      <p *ngFor="let linea of lastAnalysis!.health_summary!.split('\\n')" class="summary-line">{{ linea }}</p>
+    </div>
+  </div>
+
+  <!-- Alertas del Backend -->
+  <div class="analysis-section" *ngIf="lastAnalysis.warnings">
+    <h3>⚠️ Alertas del Análisis</h3>
+    <ul class="backend-warning-list">
+      <li *ngFor="let warning of getWarningsArray()" class="backend-warning-item">{{ warning }}</li>
+    </ul>
+  </div>
+
+  <!-- Sugerencias del Backend -->
+  <div class="analysis-section" *ngIf="lastAnalysis.suggestions">
+    <h3>💡 Recomendaciones Personalizadas</h3>
+    <ul class="backend-suggestion-list">
+      <li *ngFor="let suggestion of getSuggestionsArray()" class="backend-suggestion-item">{{ suggestion }}</li>
+    </ul>
+  </div>
+
+  <!-- Fecha del Análisis -->
+  <div class="analysis-footer">
+    <small>📅 Análisis realizado: {{ getDateFormat(lastAnalysis.created_at) }}</small>
+  </div>
+</div>
+
 <!-- ESTADÍSTICAS PRINCIPALES EN GRID -->
 <div class="stats-grid" *ngIf="imc !== null && score > 0">
 
