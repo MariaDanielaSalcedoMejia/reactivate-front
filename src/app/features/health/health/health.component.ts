@@ -110,8 +110,104 @@ export class HealthComponent {
     this.imcCategoria = this.getImcCategoria(profile.imc);
     this.zonas = this.buildZones(this.fcReposo ?? 0, this.reserva ?? 0);
 
-    // Cargar análisis detallado si existe
-    this.loadDetailedAnalysis();
+    // Generar análisis detallado
+    this.generateHealthAnalysis();
+
+    // Cargar análisis históricos después de un pequeño delay
+    setTimeout(() => this.loadDetailedAnalysis(), 500);
+  }
+
+  generateHealthAnalysis() {
+    // Generar resumen automático si no existe análisis histórico
+    const lines: string[] = [];
+
+    // Análisis IMC
+    if (this.imc) {
+      const imcStatus = this.imcCategoria;
+      lines.push(`📊 IMC: Tu índice de masa corporal es ${this.imc.toFixed(1)} (${imcStatus}).`);
+    }
+
+    // Análisis FC
+    if (this.fcReposo) {
+      if (this.fcReposo < 60) {
+        lines.push('❤️ Frecuencia Cardíaca: Excelente capacidad cardiovascular. Tu FC en reposo está en nivel atlético.');
+      } else if (this.fcReposo <= 80) {
+        lines.push('❤️ Frecuencia Cardíaca: Nivel saludable. Mantén el entrenamiento cardiovascular regular.');
+      } else {
+        lines.push('❤️ Frecuencia Cardíaca: Podrías mejorar tu resistencia cardiovascular con ejercicio regular.');
+      }
+    }
+
+    // Análisis general
+    if (this.score) {
+      if (this.score >= 85) {
+        lines.push('🔥 Estado General: Atleta en excelente condición. Mantén tu rutina de entrenamiento.');
+      } else if (this.score >= 70) {
+        lines.push('💪 Estado General: Buen nivel de fitness. Continúa con tus ejercicios actuales.');
+      } else if (this.score >= 50) {
+        lines.push('⚡ Estado General: Necesitas incrementar tu actividad física para mejorar tu fitness.');
+      } else {
+        lines.push('⚠️ Estado General: Te recomendamos iniciar un programa de ejercicio gradual.');
+      }
+    }
+
+    this.healthSummary = lines.join('\n');
+
+    // Generar alertas
+    this.generateWarnings();
+
+    // Generar sugerencias
+    this.generateSuggestions();
+  }
+
+  generateWarnings() {
+    this.warnings = [];
+
+    if (this.imc && this.imc > 30) {
+      this.warnings.push('Obesidad detectada. Consulta con un profesional de salud.');
+    } else if (this.imc && this.imc > 25) {
+      this.warnings.push('Sobrepeso. Considera incrementar actividad física.');
+    }
+
+    if (this.fcReposo && this.fcReposo > 100) {
+      this.warnings.push('FC en reposo elevada. Podría indicar estrés o falta de actividad cardiovascular.');
+    }
+
+    if (this.score && this.score < 50) {
+      this.warnings.push('Tu nivel de fitness es bajo. Empieza con ejercicios suaves.');
+    }
+  }
+
+  generateSuggestions() {
+    this.suggestions = [];
+
+    // Sugerencias según IMC
+    if (this.imc && this.imc < 25) {
+      this.suggestions.push('🎯 Mantén tu peso actual. Continúa con una alimentación balanceada.');
+    } else if (this.imc && this.imc < 30) {
+      this.suggestions.push('🎯 Aumenta tu actividad física a 30 min diarios de cardio moderado.');
+    } else {
+      this.suggestions.push('🎯 Combina ejercicio cardiovascular con entrenamiento de fuerza 5 veces/semana.');
+    }
+
+    // Sugerencias según FC
+    if (this.fcReposo && this.fcReposo < 60) {
+      this.suggestions.push('💚 Tu corazón está muy fuerte. Varía tus entrenamientos entre cardio y fuerza.');
+    } else if (this.fcReposo && this.fcReposo > 80) {
+      this.suggestions.push('💚 Incluye al menos 3 sesiones semanales de cardio (caminar, correr, natación).');
+    }
+
+    // Sugerencias según score
+    if (this.score && this.score >= 85) {
+      this.suggestions.push('🏆 Excelente fitness. Considera objetivos más avanzados: maratones, competencias.');
+    } else if (this.score && this.score >= 70) {
+      this.suggestions.push('🏆 Buen progreso. Prueba nuevos deportes o incrementa intensidad.');
+    } else if (this.score && this.score < 50) {
+      this.suggestions.push('🏆 Empieza con caminatas de 20-30 min, 3 veces por semana.');
+    }
+
+    // Sugerencia general
+    this.suggestions.push('📅 Realiza análisis de salud cada mes para seguir tu progreso.');
   }
 
   loadDetailedAnalysis() {
@@ -123,25 +219,36 @@ export class HealthComponent {
           this.parseAnalysisData();
         }
       },
-      error: () => {}
+      error: () => {
+        // Si no hay historial, continuamos con el análisis generado
+      }
     });
   }
 
   parseAnalysisData() {
     if (!this.lastAnalysis) return;
 
-    this.healthSummary = this.lastAnalysis.health_summary || this.recomendacion;
+    // Solo sobrescribir si existe análisis detallado del backend
+    if (this.lastAnalysis.health_summary) {
+      this.healthSummary = this.lastAnalysis.health_summary;
+    }
 
     try {
       if (this.lastAnalysis.warnings) {
-        this.warnings = typeof this.lastAnalysis.warnings === 'string'
+        const warnings = typeof this.lastAnalysis.warnings === 'string'
           ? JSON.parse(this.lastAnalysis.warnings)
           : this.lastAnalysis.warnings;
+        if (Array.isArray(warnings) && warnings.length > 0) {
+          this.warnings = warnings;
+        }
       }
       if (this.lastAnalysis.suggestions) {
-        this.suggestions = typeof this.lastAnalysis.suggestions === 'string'
+        const suggestions = typeof this.lastAnalysis.suggestions === 'string'
           ? JSON.parse(this.lastAnalysis.suggestions)
           : this.lastAnalysis.suggestions;
+        if (Array.isArray(suggestions) && suggestions.length > 0) {
+          this.suggestions = suggestions;
+        }
       }
     } catch (e) {
       console.error('Error parsing analysis data:', e);

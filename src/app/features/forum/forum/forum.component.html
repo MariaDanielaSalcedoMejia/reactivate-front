@@ -1,9 +1,12 @@
-<div class="forum-hero">
-  <h1>Foro Comunitario</h1>
-  <p>Comparte experiencias, consejos y motiva a otros en su camino hacia una vida más activa</p>
-</div>
+<div class="forum-container">
 
-<div class="forum-content">
+  <!-- HERO SECTION -->
+  <div class="forum-hero">
+    <h1>🤝 Foro Comunitario</h1>
+    <p>Comparte experiencias, consejos y únete a nuestra comunidad de atletas</p>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
   <div class="forum-stats">
     <div class="stat-card">
       <div class="stat-number">{{ forumStats.totalPosts }}</div>
@@ -15,54 +18,142 @@
     </div>
     <div class="stat-card">
       <div class="stat-number">{{ forumStats.totalTopics }}</div>
-      <div class="stat-label">Temas</div>
+      <div class="stat-label">Categorías</div>
     </div>
   </div>
 
-  <div class="forum-categories">
-    <h2>Categorías</h2>
-    <div class="categories-grid">
-      <div class="category-card" *ngFor="let category of categories">
-        <div class="category-icon">{{ category.icon }}</div>
-        <div class="category-content">
-          <h3>{{ category.name }}</h3>
-          <p>{{ category.description }}</p>
-          <div class="category-stats">
-            <span>{{ category.posts }} publicaciones</span>
-            <span>{{ category.topics }} temas</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- BOTÓN NUEVO POST -->
+  <div class="new-post-section">
+    <button class="btn-nuevo-post" (click)="toggleFormulario()">
+      {{ mostrarFormularioNuevo ? '❌ Cancelar' : '✍️ Crear Nuevo Post' }}
+    </button>
   </div>
 
-  <div class="recent-posts">
-    <h2>Publicaciones Recientes</h2>
-    <div class="posts-list">
-      <div class="post-card" *ngFor="let post of recentPosts">
-        <div class="post-header">
-          <div class="post-author">
-            <div class="author-avatar">{{ post.author.charAt(0).toUpperCase() }}</div>
-            <div class="author-info">
-              <div class="author-name">{{ post.author }}</div>
-              <div class="post-time">{{ post.time_ago }}</div>
+  <!-- FORMULARIO NUEVO POST -->
+  <div *ngIf="mostrarFormularioNuevo" class="formulario-nuevo-post">
+    <h2>Comparte tu Experiencia</h2>
+
+    <div class="form-group">
+      <label>Categoría</label>
+      <select [(ngModel)]="categoriaSeleccionada" class="select-categoria">
+        <option value="general">💬 General</option>
+        <option value="entrenamientos">🏋️ Entrenamientos</option>
+        <option value="nutricion">🥗 Nutrición</option>
+        <option value="motivacion">💪 Motivación</option>
+        <option value="lesiones">⚕️ Lesiones & Reconocimiento</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <input type="text"
+             [(ngModel)]="nuevoPostTitulo"
+             placeholder="Título de tu post"
+             class="input-titulo">
+    </div>
+
+    <div class="form-group">
+      <textarea [(ngModel)]="nuevoPostContenido"
+                placeholder="Comparte tu experiencia, pregunta o consejo..."
+                rows="5"
+                class="textarea-contenido"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button (click)="crearNuevoPost()" class="btn-publicar">📤 Publicar</button>
+      <button (click)="toggleFormulario()" class="btn-cancelar">Cancelar</button>
+    </div>
+
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="cargando" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando el foro...</p>
+  </div>
+
+  <!-- CATEGORÍAS -->
+  <div *ngIf="!cargando" class="forum-content">
+
+    <div class="forum-categories">
+      <h2>📚 Categorías</h2>
+      <div class="categories-grid">
+        <div class="category-card" *ngFor="let category of categories">
+          <div class="category-icon">{{ getCategoryIcon(category.name) }}</div>
+          <div class="category-content">
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.description }}</p>
+            <div class="category-stats">
+              <span>{{ category.posts }} publicaciones</span>
+              <span>{{ category.topics }} temas</span>
             </div>
           </div>
-          <div class="post-category">{{ post.category }}</div>
-        </div>
-        <div class="post-content">
-          <h4>{{ post.title }}</h4>
-          <p>{{ post.excerpt }}</p>
-        </div>
-        <div class="post-footer">
-          <div class="post-stats">
-            <span>👍 {{ post.likes }}</span>
-            <span>💬 {{ post.replies }}</span>
-          </div>
-          <button class="read-more-btn" (click)="readPost(post.id)">Leer más</button>
         </div>
       </div>
     </div>
+
+    <!-- PUBLICACIONES RECIENTES -->
+    <div class="recent-posts">
+      <h2>🔥 Publicaciones Recientes</h2>
+
+      <div *ngIf="recentPosts.length === 0" class="empty-state">
+        <p>Sé el primer en crear un post en el foro 🚀</p>
+        <button (click)="toggleFormulario()" class="btn-crear-primero">Crear Primer Post</button>
+      </div>
+
+      <div class="posts-list" *ngIf="recentPosts.length > 0">
+        <div class="post-card" *ngFor="let post of postsAMostrar; let idx = index" [style.animation-delay]="(idx * 100) + 'ms'">
+          <div class="post-header">
+            <div class="category-badge">{{ getCategoryIcon(post.category) }} {{ post.category }}</div>
+            <div class="post-meta">
+              <strong>{{ post.author }}</strong>
+              <span class="time-ago">{{ post.time_ago }}</span>
+            </div>
+          </div>
+
+          <div class="post-content">
+            <h4>{{ post.title }}</h4>
+            <p>{{ post.excerpt }}</p>
+          </div>
+
+          <div class="post-footer">
+            <div class="post-stats">
+              <span class="stat">❤️ {{ post.likes }}</span>
+              <span class="stat">💬 {{ post.replies }}</span>
+            </div>
+            <button class="read-more-btn" (click)="readPost(post.id)">Leer más →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div *ngIf="totalPaginas > 1" class="pagination">
+        <button (click)="irAPagina(paginaActual - 1)"
+                [disabled]="paginaActual === 1"
+                class="btn-nav">◀ Anterior</button>
+
+        <div class="page-numbers">
+          <button *ngFor="let p of paginasArray"
+                  [class.active]="p === paginaActual"
+                  (click)="irAPagina(p)">
+            {{ p }}
+          </button>
+        </div>
+
+        <button (click)="irAPagina(paginaActual + 1)"
+                [disabled]="paginaActual === totalPaginas"
+                class="btn-nav">Siguiente ▶</button>
+
+        <span class="page-info">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+      </div>
+    </div>
   </div>
+
+  <!-- ERROR STATE -->
+  <div *ngIf="error && !cargando" class="error-message">
+    <p>⚠️ {{ error }}</p>
+    <button (click)="cargarContenido()">Reintentar</button>
+  </div>
+
 </div>
 

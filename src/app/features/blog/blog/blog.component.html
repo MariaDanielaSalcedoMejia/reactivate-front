@@ -1,38 +1,113 @@
-<div class="health-hero">
-  <h1>Blog Fitness</h1>
-  <p>Comparte tus experiencias y motiva a otros 💬</p>
-</div>
+<div class="blog-container">
 
-<!-- 📝 CREAR POST -->
-<div class="post-box">
-
-  <textarea
-    [(ngModel)]="mensaje"
-    placeholder="¿Qué hiciste hoy? ¿Cómo te sentiste?"
-  ></textarea>
-
-  <div class="actions">
-    <button (click)="publicar()">Publicar</button>
+  <!-- HERO SECTION -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1>🥗 Recetas & Nutrición</h1>
+      <p>Descubre deliciosas recetas saludables para potenciar tu rendimiento atlético</p>
+    </div>
   </div>
 
-  <div class="error" *ngIf="error">{{ error }}</div>
-</div>
+  <!-- CREAR RECETA -->
+  <div class="post-box">
+    <h2>✍️ Comparte tu Receta</h2>
 
-<!-- 📰 FEED -->
-<div class="feed">
-
-  <div class="post-card" *ngFor="let post of posts">
-
-    <div class="post-header">
-      <div class="avatar">👤</div>
-      <div>
-        <strong>{{ post.author_id ? 'Usuario registrado' : 'Invitado' }}</strong>
-        <small>{{ post.created_at | date:'short' }}</small>
-      </div>
+    <div class="form-group">
+      <input
+        type="text"
+        [(ngModel)]="titulo"
+        placeholder="Nombre de la receta (ej: Ensalada de Pollo con Aguacate)"
+        class="input-titulo"
+      >
     </div>
 
-    <h3>{{ post.title }}</h3>
-    <p class="post-text">{{ post.content }}</p>
+    <div class="form-group">
+      <textarea
+        [(ngModel)]="mensaje"
+        placeholder="Ingredientes y preparación..."
+        rows="6"
+      ></textarea>
+    </div>
+
+    <div class="actions">
+      <button (click)="publicar()" class="btn-publicar">
+        📤 Publicar Receta
+      </button>
+    </div>
+
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </div>
+
+  <!-- FILTRO DE CATEGORÍAS -->
+  <div class="categorias-filter">
+    <button *ngFor="let cat of categorias"
+            [class.active]="filtroCategoria === cat.id"
+            (click)="seleccionarCategoria(cat.id)">
+      {{ cat.label }}
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="cargando" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando recetas...</p>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div *ngIf="!cargando" class="feed">
+
+    <!-- CONTADOR -->
+    <div class="results-counter">
+      <p>Mostrando <strong>{{ postsPaginados.length }}</strong> de <strong>{{ postosFiltrados.length }}</strong> recetas</p>
+    </div>
+
+    <!-- POSTS VACÍOS -->
+    <div *ngIf="postosFiltrados.length === 0" class="empty-state">
+      <p>😅 No hay recetas en esta categoría</p>
+      <button (click)="seleccionarCategoria('todas')">Ver todas</button>
+    </div>
+
+    <!-- FEED DE RECETAS -->
+    <div *ngFor="let post of postsPaginados; let idx = index" class="post-card" [style.animation-delay]="(idx * 100) + 'ms'">
+
+      <div class="post-header">
+        <div class="avatar">👨‍🍳</div>
+        <div>
+          <strong>{{ post.author_id ? 'Chef Comunitario' : 'Nutritionista' }}</strong>
+          <small>{{ formatearFecha(post.created_at) }}</small>
+        </div>
+      </div>
+
+      <h3>{{ post.title }}</h3>
+      <p class="post-text">{{ post.content }}</p>
+
+      <div class="post-actions">
+        <button class="btn-favorito">❤️ Guardar</button>
+        <button class="btn-compartir">📤 Compartir</button>
+      </div>
+
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div *ngIf="totalPaginas > 1" class="pagination">
+      <button (click)="irAPagina(paginaActual - 1)"
+              [disabled]="paginaActual === 1"
+              class="btn-nav">◀ Anterior</button>
+
+      <div class="page-numbers">
+        <button *ngFor="let p of paginasArray"
+                [class.active]="p === paginaActual"
+                (click)="irAPagina(p)">
+          {{ p }}
+        </button>
+      </div>
+
+      <button (click)="irAPagina(paginaActual + 1)"
+              [disabled]="paginaActual === totalPaginas"
+              class="btn-nav">Siguiente ▶</button>
+
+      <span class="page-info">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+    </div>
 
   </div>
 

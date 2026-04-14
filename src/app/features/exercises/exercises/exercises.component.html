@@ -1,50 +1,111 @@
-<div class="health-hero">
-</div>
+<div class="exercises-container">
 
-<!-- FILTRO -->
-<div class="segmentos">
-
-  <!-- TODOS -->
-  <div class="segmento"
-       [class.active]="filtroActivo === 'todos'"
-       (click)="seleccionarFiltro('todos')">
-
-    <div class="icono">🌐</div>
-    <span>Todos</span>
-
-  </div>
-
-  <!-- DEMÁS -->
-  <div class="segmento"
-       *ngFor="let s of segmentos"
-       [class.active]="filtroActivo === s.nombre"
-       (click)="seleccionarFiltro(s.nombre)">
-
-    <div class="icono">{{ s.icono }}</div>
-    <span>{{ s.label }}</span>
-
-  </div>
-
-</div>
-
-<!-- GRID DINÁMICO -->
-<div class="grid">
-
-  <div class="card" *ngFor="let e of ejerciciosFiltrados">
-
-    <div class="image"
-         [style.backgroundImage]="'url(' + e.imagen + ')'">
+  <!-- HERO SECTION CON IMAGEN DE SEGMENTO -->
+  <div class="hero-section">
+    <div class="hero-image" [style.backgroundImage]="'url(' + imagenSegmento + ')'"></div>
+    <div class="hero-overlay">
+      <h1>{{ labelSegmento }}</h1>
+      <p *ngIf="filtroActivo !== 'todos'">
+        <span class="cantidad">{{ ejerciciosFiltrados.length }} ejercicios disponibles</span>
+      </p>
+      <p *ngIf="filtroActivo === 'todos'">
+        <span class="cantidad">{{ ejercicios.length }} ejercicios en total</span>
+      </p>
     </div>
+  </div>
 
-    <div class="content">
-      <h3>{{ e.nombre }}</h3>
-      <p>{{ e.descripcion }}</p>
+  <!-- LOADING STATE -->
+  <div *ngIf="cargando" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando ejercicios...</p>
+  </div>
 
-      <div class="parque">
-        📍 {{ e.parque }}
+  <!-- ERROR STATE -->
+  <div *ngIf="error && !cargando" class="error-message">
+    <p>⚠️ {{ error }}</p>
+    <button (click)="cargarEjercicios()">Reintentar</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div *ngIf="!cargando && !error" class="content">
+
+    <!-- FILTRO -->
+    <div class="segmentos">
+      <!-- TODOS -->
+      <div class="segmento"
+           [class.active]="filtroActivo === 'todos'"
+           (click)="seleccionarFiltro('todos')">
+        <div class="icono">🌐</div>
+        <span>Todos</span>
+        <div class="sub-label">{{ ejercicios.length }}+</div>
+      </div>
+
+      <!-- DEMÁS -->
+      <div class="segmento"
+           *ngFor="let s of segmentos"
+           [class.active]="filtroActivo === s.nombre"
+           (click)="seleccionarFiltro(s.nombre)">
+        <div class="icono">{{ s.icono }}</div>
+        <span>{{ s.label }}</span>
+        <div class="sub-label">{{ s.cantidad }}+</div>
       </div>
     </div>
 
+    <!-- CONTADOR DE RESULTADOS -->
+    <div class="results-info">
+      <p>Mostrando <strong>{{ ejerciciosAMostrar.length }}</strong> de <strong>{{ ejerciciosFiltrados.length }}</strong> ejercicios</p>
+    </div>
+
+    <!-- GRID DINÁMICO -->
+    <div class="grid">
+      <div class="card" *ngFor="let e of ejerciciosAMostrar; let idx = index" [style.animation-delay]="(idx * 50) + 'ms'">
+        <div class="image-container">
+          <div class="image" [style.backgroundImage]="'url(' + e.imagen + ')'"></div>
+          <div class="tipo-badge">{{ e.tipo | uppercase }}</div>
+        </div>
+
+        <div class="content">
+          <h3>{{ e.nombre }}</h3>
+          <p>{{ e.descripcion }}</p>
+
+          <div class="footer">
+            <div class="parque">
+              📍 {{ e.parque }}
+            </div>
+            <button class="btn-detalles" (click)="verDetalles($event)">Ver</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="ejerciciosFiltrados.length === 0" class="empty-state">
+      <p>😅 No hay ejercicios disponibles en esta categoría</p>
+      <button (click)="seleccionarFiltro('todos')">Ver todos</button>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div *ngIf="totalPaginas > 1" class="pagination">
+      <button [disabled]="pagina === 1" (click)="paginaAnterior()" class="btn-nav">
+        ◀ Anterior
+      </button>
+
+      <div class="page-numbers">
+        <button *ngFor="let p of paginasArray"
+                [class.active]="p === pagina"
+                (click)="irAPagina(p)">
+          {{ p }}
+        </button>
+      </div>
+
+      <button [disabled]="pagina === totalPaginas" (click)="paginaSiguiente()" class="btn-nav">
+        Siguiente ▶
+      </button>
+
+      <span class="page-info">Página {{ pagina }} de {{ totalPaginas }}</span>
+    </div>
+
   </div>
 
 </div>
+
