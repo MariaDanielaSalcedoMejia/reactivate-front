@@ -80,20 +80,34 @@ export class HealthComponent {
 
     if (!this.user) {
       this.error = 'Debes iniciar sesión para guardar tu perfil de salud.';
+      console.warn('🚫 No hay usuario logueado');
       return;
     }
 
     if (!this.edad || !this.peso || !this.altura || !this.fcReposo) {
       this.error = 'Completa todos los campos';
+      console.warn('🚫 Campos incompletos:', { edad: this.edad, peso: this.peso, altura: this.altura, fcReposo: this.fcReposo });
       return;
     }
 
+    console.log('📤 Enviando datos de salud...', {
+      userId: this.user.id,
+      altura: this.altura,
+      peso: this.peso,
+      fcReposo: this.fcReposo,
+      edad: this.edad
+    });
+
     this.healthService.saveProfile(this.user.id, this.altura, this.peso, this.fcReposo, this.edad).subscribe({
       next: (profile) => {
+        console.log('✅ Datos guardados exitosamente:', profile);
         this.applyProfile(profile);
         this.loadHistory(); // Recargar historial después de guardar
       },
-      error: (err) => this.error = typeof err === 'string' ? err : 'No fue posible guardar el perfil'
+      error: (err) => {
+        console.error('❌ Error al guardar:', err);
+        this.error = typeof err === 'string' ? err : 'Error al guardar el perfil de salud. Por favor intenta nuevamente.';
+      }
     });
   }
 

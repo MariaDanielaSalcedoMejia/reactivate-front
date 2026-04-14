@@ -68,20 +68,32 @@
 }
 
 .btn.primary:hover {
-  transform: translateY(-2px);
-  background: #f8f9fa
+  transform: translateY(-3px);
+  background: #f0f0f0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .2)
 }
 
 .btn.outline {
   background: transparent;
   border-color: #fff;
-  color: #fff
+  color: #fff;
+  font-weight: 600
 }
 
 .btn.outline:hover {
-  background: rgba(255, 255, 255, .1);
-  border-color: rgba(255, 255, 255, .8);
-  transform: translateY(-1px)
+  background: rgba(255, 255, 255, .15);
+  border-color: rgba(255, 255, 255, 1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .3)
+}
+
+.buttons {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1rem;
 }
 
 .features {
