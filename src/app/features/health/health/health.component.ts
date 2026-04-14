@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HealthService, HealthProfile } from '../../../core/services/health.service';
+import { HealthService, HealthProfile, HealthAnalysis } from '../../../core/services/health.service';
 import { AuthService, UserResponse } from '../../../core/services/auth.service';
 
 @Component({
@@ -12,9 +12,7 @@ import { AuthService, UserResponse } from '../../../core/services/auth.service';
   styleUrls: ['./health.component.css']
 })
 export class HealthComponent {
-
   user: UserResponse | null = null;
-
   edad: number | null = null;
   peso: number | null = null;
   altura: number | null = null;
@@ -32,6 +30,16 @@ export class HealthComponent {
   nivel = '';
   error = '';
 
+  // Nuevas propiedades para análisis detallado
+  healthSummary = '';
+  warnings: string[] = [];
+  suggestions: string[] = [];
+  lastAnalysis: HealthAnalysis | null = null;
+
+  // Propiedades para historial
+  showHistory = false;
+  analysisHistory: HealthAnalysis[] = [];
+
   constructor(
     private healthService: HealthService,
     private authService: AuthService
@@ -39,28 +47,30 @@ export class HealthComponent {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-
-    console.log('👤 USER AL INICIAR:', this.user); // DEBUG
-
-    if (this.user && this.user.id) {
+    if (this.user) {
       this.loadProfile();
+      this.loadHistory();
     }
   }
 
   loadProfile() {
-    if (!this.user || !this.user.id) {
-      console.warn('⚠️ Usuario no válido para cargar perfil');
-      return;
-    }
-
+    if (!this.user) return;
     this.healthService.getProfile(this.user.id).subscribe({
-      next: (profile) => {
-        if (profile) {
-          this.applyProfile(profile);
-        }
+      next: (profile) => this.applyProfile(profile),
+      error: () => {
+        // Si no hay perfil, lo dejamos vacío para que el usuario lo registre.
+      }
+    });
+  }
+
+  loadHistory() {
+    if (!this.user) return;
+    this.healthService.getAnalysisHistory(this.user.id).subscribe({
+      next: (history) => {
+        this.analysisHistory = history;
       },
-      error: (err) => {
-        console.warn('⚠️ No hay perfil aún o backend falló', err);
+      error: () => {
+        // Sin historial aún
       }
     });
   }
@@ -68,10 +78,8 @@ export class HealthComponent {
   calcular() {
     this.error = '';
 
-    console.log('👤 USER AL CALCULAR:', this.user); // DEBUG
-
-    if (!this.user || !this.user.id) {
-      this.error = 'Usuario no válido. Inicia sesión nuevamente.';
+    if (!this.user) {
+      this.error = 'Debes iniciar sesión para guardar tu perfil de salud.';
       return;
     }
 
@@ -80,51 +88,64 @@ export class HealthComponent {
       return;
     }
 
-    // 🔥 CALCULO LOCAL (INMEDIATO)
-    const imcLocal = this.peso / Math.pow(this.altura / 100, 2);
-    this.imc = Number(imcLocal.toFixed(1));
-    this.imcCategoria = this.getImcCategoria(this.imc);
-
-    this.fcMax = 220 - this.edad;
-    this.reserva = this.fcMax - this.fcReposo;
-    this.zonas = this.buildZones(this.fcReposo, this.reserva);
-
-    this.score = 80;
-    this.nivel = 'Analizando...';
-    this.recomendacion = 'Procesando datos...';
-
-    // 🔄 BACKEND
-    this.healthService.saveProfile(this.user.id, this.altura, this.peso, this.fcReposo)
-      .subscribe({
-        next: (profile) => {
-          console.log('✅ RESPUESTA BACKEND:', profile);
-          this.applyProfile(profile);
-        },
-        error: (err) => {
-          console.error('🔥 ERROR BACKEND:', err);
-
-          // fallback local
-          this.nivel = this.getNivelLocal();
-          this.recomendacion = this.getRecomendacionLocal();
-        }
-      });
+    this.healthService.saveProfile(this.user.id, this.altura, this.peso, this.fcReposo, this.edad).subscribe({
+      next: (profile) => {
+        this.applyProfile(profile);
+        this.loadHistory(); // Recargar historial después de guardar
+      },
+      error: (err) => this.error = typeof err === 'string' ? err : 'No fue posible guardar el perfil'
+    });
   }
 
   applyProfile(profile: HealthProfile) {
     this.altura = profile.height_cm;
     this.peso = profile.weight_kg;
     this.fcReposo = profile.resting_hr;
-
     this.imc = profile.imc;
     this.score = profile.score;
     this.nivel = profile.level;
     this.recomendacion = profile.recommendation;
-
     this.fcMax = this.edad ? 220 - this.edad : null;
     this.reserva = this.fcMax && this.fcReposo ? this.fcMax - this.fcReposo : null;
-
     this.imcCategoria = this.getImcCategoria(profile.imc);
     this.zonas = this.buildZones(this.fcReposo ?? 0, this.reserva ?? 0);
+
+    // Cargar análisis detallado si existe
+    this.loadDetailedAnalysis();
+  }
+
+  loadDetailedAnalysis() {
+    if (!this.user) return;
+    this.healthService.getAnalysisHistory(this.user.id).subscribe({
+      next: (history) => {
+        if (history.length > 0) {
+          this.lastAnalysis = history[0]; // El más reciente
+          this.parseAnalysisData();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  parseAnalysisData() {
+    if (!this.lastAnalysis) return;
+
+    this.healthSummary = this.lastAnalysis.health_summary || this.recomendacion;
+
+    try {
+      if (this.lastAnalysis.warnings) {
+        this.warnings = typeof this.lastAnalysis.warnings === 'string'
+          ? JSON.parse(this.lastAnalysis.warnings)
+          : this.lastAnalysis.warnings;
+      }
+      if (this.lastAnalysis.suggestions) {
+        this.suggestions = typeof this.lastAnalysis.suggestions === 'string'
+          ? JSON.parse(this.lastAnalysis.suggestions)
+          : this.lastAnalysis.suggestions;
+      }
+    } catch (e) {
+      console.error('Error parsing analysis data:', e);
+    }
   }
 
   getImcCategoria(imc: number) {
@@ -146,28 +167,39 @@ export class HealthComponent {
     }));
   }
 
-  getNivelLocal(): string {
-    if (!this.imc || !this.fcReposo) return '';
-
-    if (this.imc >= 18.5 && this.imc <= 25 && this.fcReposo < 60) return 'Atleta 🔥';
-    if (this.imc < 25 && this.fcReposo <= 80) return 'Buen nivel 💪';
-    if (this.imc < 30) return 'Mejorable ⚡';
-    return 'Bajo rendimiento ⚠️';
-  }
-
-  getRecomendacionLocal(): string {
-    if (!this.imc || !this.fcReposo) return '';
-
-    if (this.imc < 18.5) return 'Aumenta tu ingesta calórica con alimentos nutritivos.';
-    if (this.imc <= 25) return 'Mantén tu rutina actual y mejora progresivamente.';
-    if (this.imc <= 30) return 'Combina cardio y fuerza para mejorar composición corporal.';
-    return 'Enfócate en hábitos básicos: alimentación y ejercicio progresivo.';
-  }
-
   get mensajeFcReposo(): string {
     if (!this.fcReposo) return '';
     if (this.fcReposo < 60) return 'Excelente capacidad cardiovascular 🔥';
     if (this.fcReposo <= 80) return 'Nivel saludable 👍';
     return 'Podrías mejorar tu resistencia ⚡';
   }
+
+  toggleHistory() {
+    this.showHistory = !this.showHistory;
+  }
+
+  getDateFormat(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  viewAnalysisDetail(analysis: HealthAnalysis) {
+    this.lastAnalysis = analysis;
+    this.parseAnalysisData();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  getScoreColor(score: number): string {
+    if (score >= 85) return '#4CAF50';  // Verde
+    if (score >= 70) return '#2196F3';  // Azul
+    if (score >= 50) return '#FF9800';  // Naranja
+    return '#f44336';                    // Rojo
+  }
 }
+
