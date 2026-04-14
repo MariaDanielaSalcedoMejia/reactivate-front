@@ -403,34 +403,6 @@ export class HealthComponent {
     return `M 75,25 A 50,50 0 ${largeArc} 1 ${x},${y}`;
   }
 
-  // ==================== MÉTODOS AUXILIARES PARA PARSEAR DATOS ====================
-
-  getWarningsArray(): string[] {
-    if (!this.lastAnalysis || !this.lastAnalysis.warnings) return [];
-    try {
-      const warnings = typeof this.lastAnalysis.warnings === 'string'
-        ? JSON.parse(this.lastAnalysis.warnings)
-        : this.lastAnalysis.warnings;
-      return Array.isArray(warnings) ? warnings : [];
-    } catch (e) {
-      console.error('Error parsing warnings:', e);
-      return [];
-    }
-  }
-
-  getSuggestionsArray(): string[] {
-    if (!this.lastAnalysis || !this.lastAnalysis.suggestions) return [];
-    try {
-      const suggestions = typeof this.lastAnalysis.suggestions === 'string'
-        ? JSON.parse(this.lastAnalysis.suggestions)
-        : this.lastAnalysis.suggestions;
-      return Array.isArray(suggestions) ? suggestions : [];
-    } catch (e) {
-      console.error('Error parsing suggestions:', e);
-      return [];
-    }
-  }
-
   printDetailedAnalysis(analysis: HealthAnalysis) {
     console.group('%c🏥 ANÁLISIS DE SALUD DETALLADO', 'color: #E91E63; font-size: 14px; font-weight: bold;');
 
