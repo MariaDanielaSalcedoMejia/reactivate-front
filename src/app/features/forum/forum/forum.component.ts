@@ -58,10 +58,7 @@ export class ForumComponent implements OnInit {
 
     this.forumService.listPosts().subscribe({
       next: (posts) => {
-        this.recentPosts = posts.sort((a, b) => {
-          // Ordenar por más reciente
-          return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
-        });
+        this.recentPosts = posts;
         this.forumStats.totalPosts = posts.length;
         this.cargando = false;
       },

@@ -583,9 +583,6 @@
   }
 }
 
-  line-height: 1.4;
-}
-
 .category-stats {
   display: flex;
   gap: 1rem;
