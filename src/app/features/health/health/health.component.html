@@ -35,8 +35,33 @@
 
 <!-- SCORE -->
 <div class="goal-card" *ngIf="score">
-  <h2>Score Fitness: {{ score }}/100</h2>
+  <h2>Score Fitness: <span [style.color]="getScoreColor(score)">{{ score }}/100</span></h2>
   <p>{{ nivel }}</p>
+</div>
+
+<!-- RESUMEN DE ANÁLISIS DETALLADO -->
+<div class="progress-card" *ngIf="healthSummary && score">
+  <h2>📊 Conclusión del Análisis</h2>
+  <div class="analysis-summary">
+    <p class="summary-text">{{ healthSummary }}</p>
+  </div>
+</div>
+
+<!-- ALERTAS Y RECOMENDACIONES -->
+<div class="progress-card" *ngIf="(warnings.length > 0 || suggestions.length > 0) && score">
+  <div *ngIf="warnings.length > 0" class="alerts-section">
+    <h3>⚠️ Alertas Importantes</h3>
+    <ul class="warning-list">
+      <li *ngFor="let warning of warnings" class="warning-item">{{ warning }}</li>
+    </ul>
+  </div>
+
+  <div *ngIf="suggestions.length > 0" class="suggestions-section">
+    <h3>💡 Sugerencias de Mejora</h3>
+    <ul class="suggestion-list">
+      <li *ngFor="let suggestion of suggestions" class="suggestion-item">{{ suggestion }}</li>
+    </ul>
+  </div>
 </div>
 
 <!-- STATS -->
@@ -82,3 +107,30 @@
   <h2>Recomendación</h2>
   <p>{{ recomendacion }}</p>
 </div>
+
+<!-- HISTORIAL DE ANÁLISIS -->
+<div class="progress-card" *ngIf="analysisHistory.length > 0">
+  <div class="history-header">
+    <h2>📈 Historial de Análisis</h2>
+    <button (click)="toggleHistory()" class="toggle-btn">
+      {{ showHistory ? '▼ Ocultar' : '▶ Mostrar' }} ({{ analysisHistory.length }})
+    </button>
+  </div>
+
+  <div *ngIf="showHistory" class="history-list">
+    <div *ngFor="let analysis of analysisHistory" class="history-item" (click)="viewAnalysisDetail(analysis)">
+      <div class="history-item-header">
+        <span class="date">{{ getDateFormat(analysis.created_at) }}</span>
+        <span class="score" [style.color]="getScoreColor(analysis.score)">Score: {{ analysis.score }}/100</span>
+        <span class="level">{{ analysis.level }}</span>
+      </div>
+      <div class="history-item-details">
+        <span>IMC: {{ analysis.imc | number:'1.1-1' }} ({{ analysis.imc_category }})</span>
+      </div>
+      <div class="history-item-summary" *ngIf="analysis.health_summary">
+        <small>{{ analysis.health_summary | slice:0:100 }}...</small>
+      </div>
+    </div>
+  </div>
+</div>
+
