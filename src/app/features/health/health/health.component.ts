@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HealthService, HealthProfile, HealthAnalysis } from '../../../core/services/health.service';
@@ -277,15 +277,35 @@ export class HealthComponent {
   }
 
   buildZones(fcReposo: number, reserva: number) {
-    return [
-      { nombre: 'Recuperación', min: fcReposo + reserva * 0.5, max: fcReposo + reserva * 0.6, porcentaje: 50 },
-      { nombre: 'Aeróbica', min: fcReposo + reserva * 0.6, max: fcReposo + reserva * 0.7, porcentaje: 65 },
-      { nombre: 'Rendimiento', min: fcReposo + reserva * 0.7, max: fcReposo + reserva * 0.85, porcentaje: 80 }
-    ].map(z => ({
-      ...z,
-      min: Math.round(z.min),
-      max: Math.round(z.max)
-    }));
+    const recovery = {
+      nombre: 'Recuperación',
+      intensidad: '50%',
+      min: Math.round(fcReposo + reserva * 0.5),
+      max: Math.round(fcReposo + reserva * 0.6),
+      porcentaje: 50,
+      color: '#4CAF50',
+      descripcion: 'Actividad ligera, ideal para días de descanso activo'
+    };
+    const aerobic = {
+      nombre: 'Aeróbica',
+      intensidad: '65%',
+      min: Math.round(fcReposo + reserva * 0.6),
+      max: Math.round(fcReposo + reserva * 0.7),
+      porcentaje: 65,
+      color: '#2196F3',
+      descripcion: 'Resistencia cardiovascular, entrenamientos moderados'
+    };
+    const performance = {
+      nombre: 'Rendimiento',
+      intensidad: '80%',
+      min: Math.round(fcReposo + reserva * 0.7),
+      max: Math.round(fcReposo + reserva * 0.85),
+      porcentaje: 80,
+      color: '#FF9800',
+      descripcion: 'Entrenamientos intensos y competiciones'
+    };
+
+    return [recovery, aerobic, performance];
   }
 
   get mensajeFcReposo(): string {
@@ -322,5 +342,35 @@ export class HealthComponent {
     if (score >= 50) return '#FF9800';  // Naranja
     return '#f44336';                    // Rojo
   }
+
+  getNivelClass(nivel: string): string {
+    if (nivel.includes('Atleta')) return 'atleta';
+    if (nivel.includes('Buen')) return 'bien';
+    if (nivel.includes('Mejorable')) return 'mejorable';
+    return 'bajo';
+  }
+
+  getImcClass(imc: number): string {
+    if (imc < 18.5) return 'bajo';
+    if (imc < 25) return 'optimo';
+    if (imc < 30) return 'sobrepeso';
+    return 'obesidad';
+  }
+
+  getScorePath(): string {
+    // Crea una trayectoria SVG para el arco del score
+    const radius = 50;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - (this.score / 100) * circumference;
+
+    const angle = (this.score / 100) * 360 - 90;
+    const rad = (angle * Math.PI) / 180;
+    const x = 75 + radius * Math.cos(rad);
+    const y = 75 + radius * Math.sin(rad);
+
+    const largeArc = this.score > 50 ? 1 : 0;
+    return `M 75,25 A 50,50 0 ${largeArc} 1 ${x},${y}`;
+  }
 }
+
 

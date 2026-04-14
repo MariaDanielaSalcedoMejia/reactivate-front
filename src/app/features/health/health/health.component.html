@@ -10,45 +10,75 @@
   <div class="form-grid">
 
     <div class="input-group">
-      <input type="number" [(ngModel)]="edad" placeholder="Edad">
+      <input type="number" [(ngModel)]="edad" placeholder="Edad" min="10" max="120">
+      <small>Años</small>
     </div>
 
     <div class="input-group">
-      <input type="number" [(ngModel)]="peso" placeholder="Peso (kg)">
+      <input type="number" [(ngModel)]="peso" placeholder="Peso (kg)" min="20" max="200" step="0.1">
+      <small>Kilogramos</small>
     </div>
 
     <div class="input-group">
-      <input type="number" [(ngModel)]="altura" placeholder="Altura (cm)">
+      <input type="number" [(ngModel)]="altura" placeholder="Altura (cm)" min="100" max="250">
+      <small>Centímetros</small>
     </div>
 
     <div class="input-group">
-      <input type="number" [(ngModel)]="fcReposo" placeholder="FC reposo (ppm)">
-      <small>Míde al despertar los latidos por, en reposo total</small>
-      <small *ngIf="fcReposo">{{ mensajeFcReposo }}</small>
+      <input type="number" [(ngModel)]="fcReposo" placeholder="FC reposo (ppm)" min="30" max="150">
+      <small>Latidos por minuto al despertar</small>
     </div>
 
   </div>
 
-  <button (click)="calcular()">Analizar</button>
-  <div class="error" *ngIf="error">{{ error }}</div>
+  <button (click)="calcular()" class="btn-analizar">Analizar Salud</button>
+  <div class="error" *ngIf="error">❌ {{ error }}</div>
 </div>
 
-<!-- SCORE -->
-<div class="goal-card" *ngIf="score">
-  <h2>Score Fitness: <span [style.color]="getScoreColor(score)">{{ score }}/100</span></h2>
-  <p>{{ nivel }}</p>
+<!-- SCORE GENERAL -->
+<div class="goal-card" *ngIf="score > 0">
+  <h2>Score Fitness: <span [style.color]="getScoreColor(score)" class="score-value">{{ score }}/100</span></h2>
+  <div class="score-bar">
+    <div class="score-fill" [style.width.%]="score" [style.backgroundColor]="getScoreColor(score)"></div>
+  </div>
+  <p class="nivel-badge" [ngClass]="'nivel-' + getNivelClass(nivel)">{{ nivel }}</p>
 </div>
 
-<!-- RESUMEN DE ANÁLISIS DETALLADO -->
-<div class="progress-card" *ngIf="healthSummary && score">
-  <h2>📊 Conclusión del Análisis</h2>
-  <div class="analysis-summary">
-    <p class="summary-text">{{ healthSummary }}</p>
+<!-- CONCLUSIÓN PRINCIPAL CON GRÁFICO RADIAL SIMPLE -->
+<div class="progress-card conclusion-card" *ngIf="healthSummary && score > 0">
+  <div class="conclusion-layout">
+    <div class="conclusion-text">
+      <h2>📊 Análisis Detallado</h2>
+      <div class="analysis-summary">
+        <p *ngFor="let linea of healthSummary.split('\\n')" class="summary-line">{{ linea }}</p>
+      </div>
+    </div>
+
+    <!-- Mini gráfico radial circular -->
+    <div class="conclusion-visual">
+      <svg width="150" height="150" viewBox="0 0 150 150" class="radial-chart">
+        <!-- Circles for IMC, FC, Score -->
+        <circle cx="75" cy="75" r="60" fill="none" stroke="#e0e0e0" stroke-width="2"/>
+        <circle cx="75" cy="75" r="45" fill="none" stroke="#e0e0e0" stroke-width="2"/>
+        <circle cx="75" cy="75" r="30" fill="none" stroke="#e0e0e0" stroke-width="2"/>
+
+        <!-- Score arc -->
+        <path [attr.d]="getScorePath()" fill="none" [stroke]="getScoreColor(score)" stroke-width="8" stroke-linecap="round"/>
+
+        <!-- Center label -->
+        <text x="75" y="75" text-anchor="middle" dy="10" font-size="24" font-weight="bold" [style.fill]="getScoreColor(score)">
+          {{ score }}
+        </text>
+        <text x="75" y="95" text-anchor="middle" font-size="10" fill="#666">
+          Score
+        </text>
+      </svg>
+    </div>
   </div>
 </div>
 
 <!-- ALERTAS Y RECOMENDACIONES -->
-<div class="progress-card" *ngIf="(warnings.length > 0 || suggestions.length > 0) && score">
+<div *ngIf="(warnings.length > 0 || suggestions.length > 0) && score > 0" class="progress-card alerts-card">
   <div *ngIf="warnings.length > 0" class="alerts-section">
     <h3>⚠️ Alertas Importantes</h3>
     <ul class="warning-list">
@@ -64,52 +94,100 @@
   </div>
 </div>
 
-<!-- STATS -->
-<div class="stats-grid" *ngIf="imc !== null">
+<!-- ESTADÍSTICAS PRINCIPALES EN GRID -->
+<div class="stats-grid" *ngIf="imc !== null && score > 0">
 
   <div class="stat-card">
-    <h3>IMC</h3>
-    <p>{{ imc | number:'1.1-1' }}</p>
-    <small>{{ imcCategoria }}</small>
-    <small class="info">Relación peso/altura</small>
+    <div class="stat-header">
+      <h3>IMC</h3>
+      <div class="stat-icon">📏</div>
+    </div>
+    <p class="stat-value">{{ imc | number:'1.1-1' }}</p>
+    <small class="stat-category">{{ imcCategoria }}</small>
+    <div class="stat-bar" [ngClass]="'imc-' + getImcClass(imc)"></div>
   </div>
 
   <div class="stat-card">
-    <h3>FC Máxima</h3>
-    <p>{{ fcMax }}</p>
-    <small>ppm</small>
+    <div class="stat-header">
+      <h3>FC Máxima</h3>
+      <div class="stat-icon">💓</div>
+    </div>
+    <p class="stat-value">{{ fcMax }}</p>
+    <small class="stat-category">ppm</small>
+    <div class="stat-info">Fórmula: 220 - {{ edad }}</div>
   </div>
 
   <div class="stat-card">
-    <h3>Reserva</h3>
-    <p>{{ reserva }}</p>
-    <small>Karvonen</small>
+    <div class="stat-header">
+      <h3>Reserva</h3>
+      <div class="stat-icon">⚡</div>
+    </div>
+    <p class="stat-value">{{ reserva }}</p>
+    <small class="stat-category">latidos</small>
+    <div class="stat-info">{{ fcMax }} - {{ fcReposo }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <h3>FC Reposo</h3>
+      <div class="stat-icon">😴</div>
+    </div>
+    <p class="stat-value">{{ fcReposo }}</p>
+    <small class="stat-category">ppm</small>
+    <div class="stat-info" [ngClass]="fcReposo < 60 ? 'good' : fcReposo <= 80 ? 'normal' : 'warning'">
+      {{ fcReposo < 60 ? 'Excelente' : fcReposo <= 80 ? 'Normal' : 'Alto' }}
+    </div>
+  </div>
+
+</div>
+
+<!-- ZONAS DE ENTRENAMIENTO -->
+<div class="progress-card zones-card" *ngIf="fcMax !== null && fcReposo !== null && score > 0">
+  <h2>🏃 Zonas de Entrenamiento</h2>
+
+  <div class="zones-container">
+    <div *ngFor="let zona of zonas" class="zone-item">
+      <div class="zone-header">
+        <span class="zone-name">{{ zona.nombre }}</span>
+        <span class="zone-intensity">{{ zona.intensidad }}</span>
+      </div>
+      <div class="zone-range">
+        <strong>{{ zona.min }} - {{ zona.max }} ppm</strong>
+      </div>
+      <div class="zone-bar-container">
+        <div class="zone-bar" [style.width.%]="zona.porcentaje" [style.backgroundColor]="zona.color"></div>
+      </div>
+      <small class="zone-description">{{ zona.descripcion }}</small>
+    </div>
   </div>
 </div>
 
-<!-- ZONAS -->
-<div class="progress-card" *ngIf="fcMax !== null">
-  <h2>Zonas de entrenamiento</h2>
-
-  <div *ngFor="let zona of zonas">
-    <div class="progress-row">
-      <span>{{ zona.nombre }}</span>
-      <span>{{ zona.min }} - {{ zona.max }}</span>
+<!-- RECOMENDACIÓN PERSONALIZADA -->
+<div class="goal-card recommendation-card" *ngIf="imc !== null && score > 0">
+  <h2>🎯 Plan Recomendado</h2>
+  <p class="recommendation-text">{{ recomendacion }}</p>
+  <div class="recommendation-actions">
+    <div class="action-item">
+      <span>✓</span>
+      <span>Realiza ejercicio regular</span>
     </div>
-    <div class="progress-bar">
-      <span [style.width.%]="zona.porcentaje"></span>
+    <div class="action-item">
+      <span>✓</span>
+      <span>Mantén una dieta balanceada</span>
+    </div>
+    <div class="action-item">
+      <span>✓</span>
+      <span>Duerme 7-9 horas</span>
+    </div>
+    <div class="action-item">
+      <span>✓</span>
+      <span>Monitorea tu progreso</span>
     </div>
   </div>
-</div>
-
-<!-- RECOMENDACIÓN -->
-<div class="goal-card" *ngIf="imc !== null">
-  <h2>Recomendación</h2>
-  <p>{{ recomendacion }}</p>
 </div>
 
 <!-- HISTORIAL DE ANÁLISIS -->
-<div class="progress-card" *ngIf="analysisHistory.length > 0">
+<div class="progress-card history-card" *ngIf="analysisHistory && analysisHistory.length > 0">
   <div class="history-header">
     <h2>📈 Historial de Análisis</h2>
     <button (click)="toggleHistory()" class="toggle-btn">
@@ -118,19 +196,18 @@
   </div>
 
   <div *ngIf="showHistory" class="history-list">
-    <div *ngFor="let analysis of analysisHistory" class="history-item" (click)="viewAnalysisDetail(analysis)">
+    <div *ngFor="let analysis of analysisHistory | slice:0:5" class="history-item">
       <div class="history-item-header">
         <span class="date">{{ getDateFormat(analysis.created_at) }}</span>
-        <span class="score" [style.color]="getScoreColor(analysis.score)">Score: {{ analysis.score }}/100</span>
-        <span class="level">{{ analysis.level }}</span>
+        <span class="score-badge" [style.color]="getScoreColor(analysis.score)">{{ analysis.score }}/100</span>
+        <span class="level-badge">{{ analysis.level }}</span>
       </div>
       <div class="history-item-details">
-        <span>IMC: {{ analysis.imc | number:'1.1-1' }} ({{ analysis.imc_category }})</span>
-      </div>
-      <div class="history-item-summary" *ngIf="analysis.health_summary">
-        <small>{{ analysis.health_summary | slice:0:100 }}...</small>
+        <span>📏 IMC: {{ analysis.imc | number:'1.1-1' }} ({{ analysis.imc_category }})</span>
+        <span>💓 FC: {{ analysis.resting_hr }} ppm</span>
       </div>
     </div>
   </div>
 </div>
+
 
