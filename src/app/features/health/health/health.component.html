@@ -127,7 +127,7 @@
     <div class="stat-info">{{ fcMax }} - {{ fcReposo }}</div>
   </div>
 
-  <div class="stat-card">
+  <div class="stat-card" *ngIf="fcReposo !== null">
     <div class="stat-header">
       <h3>FC Reposo</h3>
       <div class="stat-icon">😴</div>
