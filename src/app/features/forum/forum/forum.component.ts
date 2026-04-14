@@ -86,15 +86,12 @@ export class ForumComponent implements OnInit {
     const nuevoPost: ForumPost = {
       id: this.recentPosts.length + 1,
       title: this.nuevoPostTitulo,
-      content: this.nuevoPostContenido,
+      excerpt: this.nuevoPostContenido.substring(0, 100) + '...',
       category: this.categoriaSeleccionada,
       author: autor,
-      author_id: user?.id || null,
-      created_at: new Date().toISOString(),
       time_ago: 'ahora',
       likes: 0,
-      replies: 0,
-      excerpt: this.nuevoPostContenido.substring(0, 100) + '...'
+      replies: 0
     };
 
     this.recentPosts.unshift(nuevoPost);

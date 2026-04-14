@@ -63,7 +63,7 @@
         <circle cx="75" cy="75" r="30" fill="none" stroke="#e0e0e0" stroke-width="2"/>
 
         <!-- Score arc -->
-        <path [attr.d]="getScorePath()" fill="none" [stroke]="getScoreColor(score)" stroke-width="8" stroke-linecap="round"/>
+        <path [attr.d]="getScorePath()" fill="none" [attr.stroke]="getScoreColor(score)" stroke-width="8" stroke-linecap="round"/>
 
         <!-- Center label -->
         <text x="75" y="75" text-anchor="middle" dy="10" font-size="24" font-weight="bold" [style.fill]="getScoreColor(score)">
